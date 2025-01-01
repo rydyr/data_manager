@@ -2,7 +2,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 // Factory for form fields
-const createFormField = (type, label, options = [], readOnlyConditions = null, visibilityConditions = null) => {
+const createFormField = (type, label, options = [], readOnlyConditions = null, visibilityConditions = null, testId = null) => {
   const validFieldTypes = ['text', 'number', 'checkbox', 'dropdown'];
   if (!validFieldTypes.includes(type)) {
     throw new Error(`Invalid field type: ${type}`);
@@ -15,12 +15,13 @@ const createFormField = (type, label, options = [], readOnlyConditions = null, v
     options,
     readOnlyConditions: readOnlyConditions || null,
     visibilityConditions: visibilityConditions || null,
+    testId,
   };
 };
 
 
 // Task schema
-const createTask = (name, formFields = [], readOnlyConditions = null, visibilityConditions, label = null) => ({
+const createTask = (name, formFields = [], readOnlyConditions = null, visibilityConditions, label = null, testId = null) => ({
   id: uuidv4(),
   name,
   label: label || name,
@@ -28,11 +29,12 @@ const createTask = (name, formFields = [], readOnlyConditions = null, visibility
   formFields,
   readOnlyConditions: readOnlyConditions || null,
   visibilityConditions: visibilityConditions || null,
+  testId,
 });
 
 
 // Task Group schema
-const createTaskGroup = (name, tasks = [], label = null) => ({
+const createTaskGroup = (name, tasks = [], label = null, testId = null) => ({
   id: uuidv4(),
   name,
   label: label || name,
@@ -43,11 +45,12 @@ const createTaskGroup = (name, tasks = [], label = null) => ({
     if (statuses.some((status) => status === 'in-progress' || status === 'complete')) return 'in-progress';
     return 'pending';
   },
+  testId,
 });
 
 
 // Component schema
-const createComponent = (name, formFields = [], taskGroups = [], visibilityConditions, label = null) => ({
+const createComponent = (name, formFields = [], taskGroups = [], visibilityConditions, label = null, testId = null) => ({
   id: uuidv4(),
   name,
   label: label || name,
@@ -60,11 +63,12 @@ const createComponent = (name, formFields = [], taskGroups = [], visibilityCondi
     return 'pending';
   },
   visibilityConditions: visibilityConditions || null, 
+  testId,
 });
 
 
 // Build schema
-const createBuild = (name, formFields = [], components = [], label = null) => ({
+const createBuild = (name, formFields = [], components = [], label = null, testId = null) => ({
   id: uuidv4(),
   name,
   label: label || name,
@@ -77,6 +81,7 @@ const createBuild = (name, formFields = [], components = [], label = null) => ({
     if (allStatuses.some((status) => status === 'in-progress' || status === 'complete')) return 'in-progress';
     return 'pending';
   },
+  testId,
 });
 
 

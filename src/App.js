@@ -28,7 +28,7 @@ const App = () => {
       return { ...prev, [componentId]: isExpanded };
     });
   };
-  
+
   const toggleTaskGroup = (taskGroupId) => {
     setExpandedTaskGroups((prev) => {
       const isExpanded = !prev[taskGroupId];
@@ -38,7 +38,7 @@ const App = () => {
       return { ...prev, [taskGroupId]: isExpanded };
     });
   };
-  
+
   const toggleBuild = () => {
     setBuildExpanded((prev) => {
       const isExpanded = !prev;
@@ -48,7 +48,6 @@ const App = () => {
       return isExpanded;
     });
   };
-  
 
   const getImmediateChildStatusSummary = (children) => {
     const total = children.length;
@@ -58,10 +57,20 @@ const App = () => {
 
   const renderFormFields = (formFields, context = {}) => {
     if (!Array.isArray(formFields) || formFields.length === 0) return null;
-
+  
     const { componentId = null, taskGroupId = null, taskId = null } = context; // Default values
-
+  
     return formFields.map((field) => {
+      // Generate a unique testId based on the context and field ID
+      const testId = [
+        componentId && `component-${componentId}`,
+        taskGroupId && `task-group-${taskGroupId}`,
+        taskId && `task-${taskId}`,
+        `field-${field.id}`,
+      ]
+        .filter(Boolean)
+        .join('-');
+  
       return (
         <div key={field.id} style={{ marginBottom: '10px' }}>
           <label htmlFor={`field-${field.id}`}>{field.label}</label>
@@ -74,6 +83,7 @@ const App = () => {
               onChange={(e) =>
                 handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
               }
+              data-testid={testId}
             />
           )}
           {field.type === 'number' && (
@@ -85,6 +95,7 @@ const App = () => {
               onChange={(e) =>
                 handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
               }
+              data-testid={testId}
             />
           )}
           {field.type === 'checkbox' && (
@@ -96,6 +107,7 @@ const App = () => {
               onChange={(e) =>
                 handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.checked)
               }
+              data-testid={testId}
             />
           )}
           {field.type === 'dropdown' && (
@@ -106,6 +118,7 @@ const App = () => {
               onChange={(e) =>
                 handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
               }
+              data-testid={testId}
             >
               {field.options.map((option) => (
                 <option key={option} value={option}>
@@ -118,6 +131,7 @@ const App = () => {
       );
     });
   };
+  
 
   const renderConditions = () => {
     return (
@@ -186,7 +200,7 @@ const App = () => {
     <div className="container">
       {build.name === 'Demo Build' && renderConditions()}
       <div className="actions">
-        <button onClick={saveBuildAsJSON} className='save-button'>Save</button>
+        <button onClick={saveBuildAsJSON} className="save-button">Save</button>
         <button className="upload-button">
           Load
           <input
@@ -195,13 +209,13 @@ const App = () => {
             accept="application/json"
             onChange={loadBuildFromJSON}
             style={{
-            opacity: 0,
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            width: '100%',
-            height: '100%',
-            cursor: 'pointer',
+              opacity: 0,
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: '100%',
+              height: '100%',
+              cursor: 'pointer',
             }}
           />
         </button>
@@ -211,18 +225,27 @@ const App = () => {
         <option value="sampleBuild">Sample Build</option>
         <option value="testBuild">Test Build</option>
       </select>
-      <h1>{build.name} - Status: {build.status}</h1>
-      <h2 onClick={toggleBuild} id="build-level" className="expandable">
+      <h1 data-testid="build-status">{build.name} - Status: {build.status}</h1>
+      <h2
+        onClick={toggleBuild}
+        id="build-level"
+        className="expandable"
+        data-testid="build-form-fields"
+      >
         {build.name} - Form Fields {buildExpanded ? '▼' : '▶'}
       </h2>
-      {buildExpanded && renderFormFields(build.formFields)} {/* Render build-level form fields when expanded */}
+      {buildExpanded && renderFormFields(build.formFields)}
       {build.components.map((component) => {
         const componentVisible = isVisible(component, build);
         if (!componentVisible) return null;
 
         const isComponentExpanded = expandedComponents[component.id] || false;
         return (
-          <div key={component.id}>
+          <div
+            key={component.id}
+            data-testid={`component-${component.name.toLowerCase().replace(/\s+/g, '-')}`}
+
+          >
             <h2
               onClick={() => toggleComponent(component.id)}
               id={`component-${component.id}`}
@@ -235,8 +258,7 @@ const App = () => {
             {isComponentExpanded &&
               component.taskGroups.map((taskGroup) => {
                 const taskGroupVisible = isVisible(taskGroup, build);
-                if (!taskGroupVisible) return null;
-
+                if(!taskGroupVisible) return null;
                 const isTaskGroupExpanded = expandedTaskGroups[taskGroup.id] || false;
                 return (
                   <div key={taskGroup.id} style={{ marginLeft: '20px' }}>
@@ -253,7 +275,7 @@ const App = () => {
                         const taskVisible = isVisible(task, build);
                         const taskReadOnly = isReadOnly(task, build);
                         if (!taskVisible) return null;
-
+    
                         return (
                           <div key={task.id} className="task">
                             <p>
@@ -294,7 +316,6 @@ const App = () => {
         );
       })}
     </div>
-  );
-};
+)}
 
-export default App;
+export default App
