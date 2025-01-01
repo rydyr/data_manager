@@ -1,8 +1,10 @@
 node_modules
-package.json
+
 package-lock.json
 setupTests.js
-webpack.config.js
-.babelrc
 jest.config.mjs
-.env
+.babelrc
+
+.env.development
+.env.test
+.env.production
