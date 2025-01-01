@@ -57,82 +57,85 @@ const App = () => {
 
   const renderFormFields = (formFields, context = {}) => {
     if (!Array.isArray(formFields) || formFields.length === 0) return null;
-  
-    const { componentId = null, taskGroupId = null, taskId = null } = context; // Default values
-  
-    return formFields.map((field) => {
-      // Generate a unique testId based on the context and field ID
-      const testId = [
-        componentId && `component-${componentId}`,
-        taskGroupId && `task-group-${taskGroupId}`,
-        taskId && `task-${taskId}`,
-        `field-${field.id}`,
-      ]
-        .filter(Boolean)
-        .join('-');
-  
-      return (
-        <div key={field.id} style={{ marginBottom: '10px' }}>
-          <label htmlFor={`field-${field.id}`}>{field.label}</label>
-          {field.type === 'text' && (
-            <input
-              id={`field-${field.id}`}
-              type="text"
-              value={field.value}
-              readOnly={isReadOnly(field, build)}
-              onChange={(e) =>
-                handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
-              }
-              data-testid={testId}
-            />
-          )}
-          {field.type === 'number' && (
-            <input
-              id={`field-${field.id}`}
-              type="number"
-              value={field.value}
-              readOnly={isReadOnly(field, build)}
-              onChange={(e) =>
-                handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
-              }
-              data-testid={testId}
-            />
-          )}
-          {field.type === 'checkbox' && (
-            <input
-              id={`field-${field.id}`}
-              type="checkbox"
-              checked={field.value}
-              disabled={isReadOnly(field, build)}
-              onChange={(e) =>
-                handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.checked)
-              }
-              data-testid={testId}
-            />
-          )}
-          {field.type === 'dropdown' && (
-            <select
-              id={`field-${field.id}`}
-              value={field.value}
-              disabled={isReadOnly(field, build)}
-              onChange={(e) =>
-                handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
-              }
-              data-testid={testId}
-            >
-              {field.options.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-      );
-    });
-  };
-  
 
+    const { componentId = null, taskGroupId = null, taskId = null } = context;
+
+    console.log(`Rendering form fields for componentId: ${componentId}, taskGroupId: ${taskGroupId}, taskId: ${taskId}`);
+
+    return formFields.map((field) => {
+      console.log(`Rendering form field: ${field.label} with testId: ${field.testId}`);
+       
+        // Generate a consistent data-testid attribute
+        const testId = [
+            componentId && `component-${componentId}`,
+            taskGroupId && `task-group-${taskGroupId}`,
+            taskId && `task-${taskId}`,
+            `field-${field.label.replace(/\s+/g, '-').toLowerCase()}`
+        ]
+            .filter(Boolean)
+            .join('-');
+
+        return (
+            <div key={field.id} style={{ marginBottom: '10px' }}>
+                <label htmlFor={`field-${field.id}`}>{field.label}</label>
+                {field.type === 'text' && (
+                    <input
+                        id={`field-${field.id}`}
+                        type="text"
+                        value={field.value}
+                        readOnly={isReadOnly(field, build)}
+                        onChange={(e) =>
+                            handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
+                        }
+                        data-testid={testId}
+                    />
+                )}
+                {field.type === 'number' && (
+                    <input
+                        id={`field-${field.id}`}
+                        type="number"
+                        value={field.value}
+                        readOnly={isReadOnly(field, build)}
+                        onChange={(e) =>
+                            handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
+                        }
+                        data-testid={testId}
+                    />
+                )}
+                {field.type === 'checkbox' && (
+                    <input
+                        id={`field-${field.id}`}
+                        type="checkbox"
+                        checked={field.value}
+                        disabled={isReadOnly(field, build)}
+                        onChange={(e) =>
+                            handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.checked)
+                        }
+                        data-testid={testId}
+                    />
+                )}
+                {field.type === 'dropdown' && (
+                    <select
+                        id={`field-${field.id}`}
+                        value={field.value}
+                        disabled={isReadOnly(field, build)}
+                        onChange={(e) =>
+                            handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
+                        }
+                        data-testid={testId}
+                    >
+                        {field.options.map((option) => (
+                            <option key={option} value={option}>
+                                {option}
+                            </option>
+                        ))}
+                    </select>
+                )}
+            </div>
+        );
+    });
+};
+{/*
   const renderConditions = () => {
     return (
       <div className="conditions">
@@ -149,7 +152,7 @@ const App = () => {
       </div>
     );
   };
-
+*/}
   const saveBuildAsJSON = () => {
     const jsonData = JSON.stringify(build, null, 2); // Beautify JSON
     const blob = new Blob([jsonData], { type: 'application/json' });
@@ -198,7 +201,7 @@ const App = () => {
 
   return (
     <div className="container">
-      {build.name === 'Demo Build' && renderConditions()}
+      {build.name === 'Demo Build' }{/*&& renderConditions()*/}
       <div className="actions">
         <button onClick={saveBuildAsJSON} className="save-button">Save</button>
         <button className="upload-button">
@@ -236,15 +239,19 @@ const App = () => {
       </h2>
       {buildExpanded && renderFormFields(build.formFields)}
       {build.components.map((component) => {
+        console.log('Rendering Component:', component.name);
         const componentVisible = isVisible(component, build);
-        if (!componentVisible) return null;
-
+        if (!componentVisible) {
+          console.log('Component not visible:', component.name);
+          return null;
+        }
+  
         const isComponentExpanded = expandedComponents[component.id] || false;
+  
         return (
           <div
             key={component.id}
             data-testid={`component-${component.name.toLowerCase().replace(/\s+/g, '-')}`}
-
           >
             <h2
               onClick={() => toggleComponent(component.id)}
@@ -257,11 +264,18 @@ const App = () => {
             {isComponentExpanded && renderFormFields(component.formFields, { componentId: component.id })}
             {isComponentExpanded &&
               component.taskGroups.map((taskGroup) => {
+                console.log('Rendering Task Group:', taskGroup.name);
                 const taskGroupVisible = isVisible(taskGroup, build);
-                if(!taskGroupVisible) return null;
+                if (!taskGroupVisible) {
+                  console.log('Task Group not visible:', taskGroup.name);
+                  return null;
+                }
+                const taskGroupTestId = `task-group-${taskGroup.name.replace(/\s+/g, '-').toLowerCase()}`;
+  
                 const isTaskGroupExpanded = expandedTaskGroups[taskGroup.id] || false;
+  
                 return (
-                  <div key={taskGroup.id} style={{ marginLeft: '20px' }}>
+                  <div key={taskGroup.id} style={{ marginLeft: '20px' }} data-testid={taskGroupTestId}>
                     <h3
                       onClick={() => toggleTaskGroup(taskGroup.id)}
                       id={`taskGroup-${taskGroup.id}`}
@@ -272,12 +286,25 @@ const App = () => {
                     </h3>
                     {isTaskGroupExpanded &&
                       taskGroup.tasks.map((task) => {
+                        console.log('Rendering Task:', task.name);
                         const taskVisible = isVisible(task, build);
                         const taskReadOnly = isReadOnly(task, build);
-                        if (!taskVisible) return null;
-    
+                        if (!taskVisible) {
+                          console.log('Task not visible:', task.name);
+                          return null;
+                        }
+  
+                        console.log('Rendering Task:', {
+                          name: task.name,
+                          'data-testid': `task-${taskGroup.name}-${task.name}`.replace(/\s+/g, '-').toLowerCase()
+                        });
+  
                         return (
-                          <div key={task.id} className="task">
+                          <div
+                            key={task.id}
+                            className="task"
+                            data-testid={`task-${taskGroup.name}-${task.name}`.replace(/\s+/g, '-').toLowerCase()}
+                          >
                             <p>
                               {task.name} - Status: {task.status}
                             </p>
@@ -316,6 +343,7 @@ const App = () => {
         );
       })}
     </div>
-)}
+  )};
+  
 
 export default App

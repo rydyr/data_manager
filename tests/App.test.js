@@ -15,24 +15,25 @@ test('renders the App component without crashing', () => {
   expect(container).toBeInTheDocument();
 });
 */ 
-test('renders the App component with testBuild', () => {
-    const { getByRole, getByTestId } = render(
-      <BuildProvider value={{ build: testBuild }}>
-        <App />
-      </BuildProvider>
+test('renders form fields for visible components and tasks', () => {
+    const testBuildModified = {
+        ...testBuild,
+        status: 'in-progress',
+    };
+
+    const { getByTestId } = render(
+        <BuildProvider value={{ build: testBuildModified }}>
+            <App />
+        </BuildProvider>
     );
-  
-    // Check the main build heading
-    const buildHeading = getByRole('heading', { level: 1 });
-    expect(buildHeading).toHaveTextContent(/Demo Build - Status: pending/i);
-  
-    // Expand the build-level form fields
-    const expandButton = getByRole('heading', { level: 2, name: /Demo Build - Form Fields/i });
-    fireEvent.click(expandButton); // Simulate a click to toggle expansion
-  
-    // Verify the presence of build-level form field by testId
-    expect(getByTestId('field-7f7ef2e4-a3eb-48af-a256-e4c5a92b3b17')).toBeInTheDocument();
-  });
+
+    fireEvent.click(getByTestId('component-component-a'));
+    fireEvent.click(getByTestId('task-group-a1'));
+
+    expect(getByTestId('component-component-a-task-group-a1-task-a1-1-field-note')).toBeInTheDocument();
+    expect(getByTestId('component-component-a-task-group-a1-task-a1-1-field-complete')).toBeInTheDocument();
+});
+
   
 /*
 test('renders visible components based on isVisible condition', () => {
