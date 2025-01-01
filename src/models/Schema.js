@@ -34,19 +34,20 @@ const createTask = (name, formFields = [], readOnlyConditions = null, visibility
 
 
 // Task Group schema
-const createTaskGroup = (name, tasks = [], label = null, testId = null) => ({
+const createTaskGroup = (name, tasks = [], label = null, visibilityConditions = null) => ({
   id: uuidv4(),
   name,
   label: label || name,
   tasks,
+  visibilityConditions: visibilityConditions || null, // Add visibilityConditions here
   get status() {
     const statuses = tasks.map((task) => task.status);
     if (statuses.every((status) => status === 'complete')) return 'complete';
     if (statuses.some((status) => status === 'in-progress' || status === 'complete')) return 'in-progress';
     return 'pending';
   },
-  testId,
 });
+
 
 
 // Component schema

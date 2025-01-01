@@ -3,9 +3,12 @@ import React, { useState } from 'react';
 import { useBuildContext } from './context/BuildContext.js';
 import './App.css'; // Import the CSS file
 
-const App = () => {
-  const { build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible } = useBuildContext();
 
+
+const App = () => {
+  const isVisible = () => true;
+  const { build, switchBuild, updateTaskStatus, updateFormField, isReadOnly/*, isVisible */} = useBuildContext();
+  console.log('Build Object:', build); 
   const [expandedComponents, setExpandedComponents] = useState({});
   const [expandedTaskGroups, setExpandedTaskGroups] = useState({});
   const [buildExpanded, setBuildExpanded] = useState(false); // Track build-level expansion
@@ -20,8 +23,10 @@ const App = () => {
   };
 
   const toggleComponent = (componentId) => {
+    console.log('Before Toggle:', expandedComponents);
     setExpandedComponents((prev) => {
-      const isExpanded = !prev[componentId];
+      const isExpanded = !prev[componentId];   
+      console.log(`After Toggle ${componentId}:`, { ...prev, [componentId]: isExpanded });
       if (isExpanded) {
         document.getElementById(`component-${componentId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -30,8 +35,10 @@ const App = () => {
   };
 
   const toggleTaskGroup = (taskGroupId) => {
+    console.log('Toggling Task Group:', taskGroupId);
     setExpandedTaskGroups((prev) => {
       const isExpanded = !prev[taskGroupId];
+      console.log('Expanded State for Task Group:', taskGroupId, isExpanded);
       if (isExpanded) {
         document.getElementById(`taskGroup-${taskGroupId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -74,6 +81,7 @@ const App = () => {
         ]
             .filter(Boolean)
             .join('-');
+            console.log('Generated testId:', testId);
 
         return (
             <div key={field.id} style={{ marginBottom: '10px' }}>
@@ -270,6 +278,10 @@ const App = () => {
 
     const taskGroupTestId = `task-group-${component.name.toLowerCase().replace(/\s+/g, '-')}-${taskGroup.name.toLowerCase().replace(/\s+/g, '-')}`;
     const isTaskGroupExpanded = expandedTaskGroups[taskGroup.id] || false;
+    console.log('Final Expanded Components State:', expandedComponents);
+    console.log('Final Expanded Task Groups State:', expandedTaskGroups);
+    console.log('Build Data:', build);
+
 
     return (
       <div key={taskGroup.id} data-testid={taskGroupTestId} style={{ marginLeft: '20px' }}>

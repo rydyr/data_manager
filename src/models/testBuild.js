@@ -1,3 +1,4 @@
+//src/models/testBuild.js
 import {
   createBuild,
   createComponent,
@@ -30,7 +31,7 @@ export const testBuild = createBuild(
               ],
               null,
               //(build) => build.status !== 'pending', // Visible if build status is not pending
-              () => true,
+              (build) => true,
               'task-a1-1'
             ),
             createTask(
@@ -41,13 +42,13 @@ export const testBuild = createBuild(
                   'Task A1.2 Status',
                   ['Not Started', 'In Progress', 'Completed'],
                   null,
-                  () => true,
+                  (build) => true,
                   'task-a1-2-status'
                 ),
               ],
               null,
               //(build) => build.components.some((comp) => comp.status === 'in-progress'), // Visible if any component is in progress
-              () => true,
+              (build) => true,
               'task-a1-2'
             ),
           ],
