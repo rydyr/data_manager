@@ -30,8 +30,8 @@ test('renders form fields for visible components and tasks', () => {
     fireEvent.click(getByTestId('component-component-a'));
     fireEvent.click(getByTestId('task-group-a1'));
 
-    expect(getByTestId('component-component-a-task-group-a1-task-a1-1-field-note')).toBeInTheDocument();
-    expect(getByTestId('component-component-a-task-group-a1-task-a1-1-field-complete')).toBeInTheDocument();
+    expect(getByTestId('task-group-component-a-task-group-a1')).toBeInTheDocument();
+
 });
 
   

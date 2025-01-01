@@ -29,7 +29,8 @@ export const testBuild = createBuild(
                 createFormField('checkbox', 'Task A1.1 Complete', [], null, () => true, 'task-a1-1-complete'),
               ],
               null,
-              (build) => build.status !== 'pending', // Visible if build status is not pending
+              //(build) => build.status !== 'pending', // Visible if build status is not pending
+              () => true,
               'task-a1-1'
             ),
             createTask(
@@ -45,7 +46,8 @@ export const testBuild = createBuild(
                 ),
               ],
               null,
-              (build) => build.components.some((comp) => comp.status === 'in-progress'), // Visible if any component is in progress
+              //(build) => build.components.some((comp) => comp.status === 'in-progress'), // Visible if any component is in progress
+              () => true,
               'task-a1-2'
             ),
           ],

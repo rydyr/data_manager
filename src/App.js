@@ -263,82 +263,70 @@ const App = () => {
             </h2>
             {isComponentExpanded && renderFormFields(component.formFields, { componentId: component.id })}
             {isComponentExpanded &&
-              component.taskGroups.map((taskGroup) => {
-                console.log('Rendering Task Group:', taskGroup.name);
-                const taskGroupVisible = isVisible(taskGroup, build);
-                if (!taskGroupVisible) {
-                  console.log('Task Group not visible:', taskGroup.name);
-                  return null;
-                }
-                const taskGroupTestId = `task-group-${taskGroup.name.replace(/\s+/g, '-').toLowerCase()}`;
-  
-                const isTaskGroupExpanded = expandedTaskGroups[taskGroup.id] || false;
-  
-                return (
-                  <div key={taskGroup.id} style={{ marginLeft: '20px' }} data-testid={taskGroupTestId}>
-                    <h3
-                      onClick={() => toggleTaskGroup(taskGroup.id)}
-                      id={`taskGroup-${taskGroup.id}`}
-                      className="expandable"
-                    >
-                      {taskGroup.name} - Status: {taskGroup.status} ({getImmediateChildStatusSummary(taskGroup.tasks)})
-                      {isTaskGroupExpanded ? ' ▼' : ' ▶'}
-                    </h3>
-                    {isTaskGroupExpanded &&
-                      taskGroup.tasks.map((task) => {
-                        console.log('Rendering Task:', task.name);
-                        const taskVisible = isVisible(task, build);
-                        const taskReadOnly = isReadOnly(task, build);
-                        if (!taskVisible) {
-                          console.log('Task not visible:', task.name);
-                          return null;
-                        }
-  
-                        console.log('Rendering Task:', {
-                          name: task.name,
-                          'data-testid': `task-${taskGroup.name}-${task.name}`.replace(/\s+/g, '-').toLowerCase()
-                        });
-  
-                        return (
-                          <div
-                            key={task.id}
-                            className="task"
-                            data-testid={`task-${taskGroup.name}-${task.name}`.replace(/\s+/g, '-').toLowerCase()}
-                          >
-                            <p>
-                              {task.name} - Status: {task.status}
-                            </p>
-                            <div>
-                              <button
-                                onClick={() => updateTaskStatus(component.id, taskGroup.id, task.id, 'pending')}
-                                disabled={taskReadOnly}
-                              >
-                                Set Pending
-                              </button>
-                              <button
-                                onClick={() => updateTaskStatus(component.id, taskGroup.id, task.id, 'in-progress')}
-                                disabled={taskReadOnly}
-                              >
-                                Set In Progress
-                              </button>
-                              <button
-                                onClick={() => updateTaskStatus(component.id, taskGroup.id, task.id, 'complete')}
-                                disabled={taskReadOnly}
-                              >
-                                Set Complete
-                              </button>
-                            </div>
-                            {renderFormFields(task.formFields, {
-                              componentId: component.id,
-                              taskGroupId: taskGroup.id,
-                              taskId: task.id,
-                            })}
-                          </div>
-                        );
-                      })}
-                  </div>
-                );
-              })}
+  component.taskGroups.map((taskGroup) => {
+    const taskGroupVisible = isVisible(taskGroup, build);
+    console.log(`Rendering Task Group: ${taskGroup.name}, Visible: ${taskGroupVisible}`);
+    if (!taskGroupVisible) return null;
+
+    const taskGroupTestId = `task-group-${component.name.toLowerCase().replace(/\s+/g, '-')}-${taskGroup.name.toLowerCase().replace(/\s+/g, '-')}`;
+    const isTaskGroupExpanded = expandedTaskGroups[taskGroup.id] || false;
+
+    return (
+      <div key={taskGroup.id} data-testid={taskGroupTestId} style={{ marginLeft: '20px' }}>
+        <h3
+          onClick={() => toggleTaskGroup(taskGroup.id)}
+          id={`taskGroup-${taskGroup.id}`}
+          className="expandable"
+        >
+          {taskGroup.name} - Status: {taskGroup.status} ({getImmediateChildStatusSummary(taskGroup.tasks)})
+          {isTaskGroupExpanded ? ' ▼' : ' ▶'}
+        </h3>
+        {isTaskGroupExpanded &&
+          taskGroup.tasks.map((task) => {
+            const taskVisible = isVisible(task, build);
+            const taskReadOnly = isReadOnly(task, build);
+            console.log(`Rendering Task: ${task.name}, Visible: ${taskVisible}`);
+            if (!taskVisible) return null;
+
+            const taskTestId = `task-${component.name.toLowerCase().replace(/\s+/g, '-')}-${taskGroup.name.toLowerCase().replace(/\s+/g, '-')}-${task.name.toLowerCase().replace(/\s+/g, '-')}`;
+
+            return (
+              <div key={task.id} className="task" data-testid={taskTestId}>
+                <p>
+                  {task.name} - Status: {task.status}
+                </p>
+                <div>
+                  <button
+                    onClick={() => updateTaskStatus(component.id, taskGroup.id, task.id, 'pending')}
+                    disabled={taskReadOnly}
+                  >
+                    Set Pending
+                  </button>
+                  <button
+                    onClick={() => updateTaskStatus(component.id, taskGroup.id, task.id, 'in-progress')}
+                    disabled={taskReadOnly}
+                  >
+                    Set In Progress
+                  </button>
+                  <button
+                    onClick={() => updateTaskStatus(component.id, taskGroup.id, task.id, 'complete')}
+                    disabled={taskReadOnly}
+                  >
+                    Set Complete
+                  </button>
+                </div>
+                {renderFormFields(task.formFields, {
+                  componentId: component.id,
+                  taskGroupId: taskGroup.id,
+                  taskId: task.id,
+                })}
+              </div>
+            );
+          })}
+      </div>
+    );
+  })}
+
           </div>
         );
       })}
