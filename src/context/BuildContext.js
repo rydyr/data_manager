@@ -112,23 +112,22 @@ export const BuildProvider = ({ children }) => {
   };
 
   // Helper function to evaluate Read-Only
-  const isReadOnly = (item, build) => {  
+  const isReadOnly = (item, build) => {
     if (!item.readOnlyConditions) {
-      console.warn(`No readOnlyConditions for ${item.name || item.id}`);
-      return false;
+        // Only log in development mode to avoid unnecessary warnings in production
+        if (process.env.NODE_ENV === 'development') {
+            console.warn(`No readOnlyConditions for ${item.name || item.id}`);
+        }
+        return false;
     }
+
     if (typeof item.readOnlyConditions !== 'function') {
-      console.error(`Invalid readOnlyConditions type for ${item.name || item.id}:`, item.readOnlyConditions);
-      return !!item.readOnlyConditions;
+        return false;
     }
-    try {
-      const result = item.readOnlyConditions(build);
-      return result;
-    } catch (error) {
-      console.error(`Error evaluating readOnlyConditions for ${item.name || item.id}:`, error);
-      return false; // Fail-safe
-    }
-  };
+
+    return item.readOnlyConditions(build);
+};
+
   
   const isVisible = (item, build) => {  
     if (!item.visibilityConditions) {

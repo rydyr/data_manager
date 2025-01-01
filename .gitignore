@@ -5,3 +5,4 @@ setupTests.js
 webpack.config.js
 .babelrc
 jest.config.mjs
+.env

@@ -3,6 +3,10 @@ import React, { useState } from 'react';
 import { useBuildContext } from './context/BuildContext.js';
 import './App.css'; // Import the CSS file
 
+if (process.env.REACT_APP_NODE_ENV === 'development') {
+  console.log('App is running in development mode');
+}
+
 
 
 const App = () => {
