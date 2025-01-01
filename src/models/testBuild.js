@@ -8,7 +8,7 @@ import {
 } from './Schema.js';
 
 export const testBuild = createBuild(
-  'Demo Build',
+  'Test Build',
   [
     // Build-level form fields
     createFormField('text', 'Build Status Note', [], null, () => true, 'build-status-note'),
