@@ -8,7 +8,8 @@ const BuildContext = createContext();
 // Provider Component
 export const BuildProvider = ({ children }) => {
   const builds = { sampleBuild, testBuild }; // Add new builds here
-  const [currentBuildKey, setCurrentBuildKey] = useState('sampleBuild'); // Default build
+  const defaultBuildKey = process.env.NODE_ENV === 'test' ? 'testBuild' : 'sampleBuild';
+  const [currentBuildKey, setCurrentBuildKey] = useState(defaultBuildKey); 
   const [build, setBuild] = useState(builds[currentBuildKey]);
 
   const switchBuild = (newBuild) => {
