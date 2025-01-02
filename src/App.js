@@ -6,8 +6,8 @@ import './App.css'; // Import the CSS file
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 
 const App = () => {
-  const isVisible = () => true;
-  const { build, switchBuild, updateTaskStatus, updateFormField, isReadOnly/*, isVisible */} = useBuildContext();
+  
+  const { build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible } = useBuildContext();
   console.log('Build Object:', build); 
   const [expandedComponents, setExpandedComponents] = useState({});
   const [expandedTaskGroups, setExpandedTaskGroups] = useState({});

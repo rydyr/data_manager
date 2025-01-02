@@ -1,0 +1,77 @@
+### **1. Rendering Tests**
+- **Verify initial rendering of the application**
+  - Ensure the main components (header, footer, etc.) render without crashing.
+  - Check that the application title or build selector dropdown is displayed.
+
+- **Check default build based on environment**
+  - Ensure the correct default build (`sampleBuild` or `testBuild`) is loaded based on the `NODE_ENV`.
+
+- **Verify rendering of build components**
+  - Ensure all build components (e.g., Component A, Component B, etc.) render correctly.
+  - Validate that their labels and form fields are displayed as expected.
+
+---
+
+### **2. User Interaction Tests**
+- **Build Selector**
+  - Simulate selecting a different build from the dropdown and verify that the build updates accordingly.
+
+- **Component Toggling**
+  - Simulate expanding/collapsing components and verify that the state updates as expected.
+  - Ensure the correct visual changes occur (e.g., toggle arrows or visibility changes).
+
+- **Task Group and Task Visibility**
+  - Expand a task group and ensure its tasks are displayed.
+  - Collapse the task group and ensure tasks are hidden.
+
+---
+
+### **3. Form Field Interaction**
+- **Form field updates**
+  - Simulate input changes (e.g., text fields, checkboxes) and verify state updates correctly.
+  - Validate proper handling of form fields with `readOnly` or visibility conditions.
+
+---
+
+### **4. Edge Cases and Error Handling**
+- **Handle unknown build selection**
+  - Attempt to switch to an unknown build and verify that an error is logged or the operation is handled gracefully.
+
+- **Validate readOnly conditions**
+  - Ensure the application correctly handles fields without `readOnlyConditions`.
+  - Simulate a situation where visibility conditions fail and verify the field is hidden.
+
+---
+
+### **5. State Management**
+- **Expanded Components and Task Groups**
+  - Verify the state of expanded components and task groups before and after user interaction.
+
+- **Build Context**
+  - Validate that the `BuildContext` provides the correct build and supports updates correctly.
+
+---
+
+### **6. Environment-Specific Tests**
+- **Development Mode**
+  - Verify that development-specific logs or behaviors are enabled.
+
+- **Test Mode**
+  - Ensure test-specific builds or behaviors are applied.
+
+- **Production Mode**
+  - Validate that production-specific settings are respected.
+
+---
+
+### **7. Snapshot Testing**
+- **Static Component Tree**
+  - Create snapshots for major states of the app (e.g., default state, expanded components) to detect unintended UI changes.
+
+---
+
+### **8. Integration Tests**
+- **Verify component interaction**
+  - Ensure that tasks and task groups interact properly with components.
+  - Verify updates to parent components when task statuses or form fields change.
+
