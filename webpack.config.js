@@ -68,3 +68,6 @@ export default {
         },
     },
 };
+
+console.log(`Loaded envFile: ${envFile}`);
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
