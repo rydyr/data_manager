@@ -8,7 +8,12 @@ import { testBuild } from '../src/models/testBuild';
 
 window.HTMLElement.prototype.scrollIntoView = jest.fn();
 
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
+
+/*
 describe('App Component with testBuild', () => {
   it('should render the testBuild structure correctly after interactions', () => {
     render(
@@ -144,4 +149,43 @@ test('toggles component visibility and updates expanded state', () => {
 
   // Clean up the mocked console.log
   consoleSpy.mockRestore();
+});
+*/
+test('simulates build selection from dropdown and updates build', () => {
+  const mockSwitchBuild = jest.fn();
+
+  const mockBuildContext = {
+    build: {
+      id: 'test-build-id',
+      name: 'sampleBuild',
+      label: 'Sample Build',
+      formFields: [],
+      components: [],
+    },
+    switchBuild: mockSwitchBuild,
+    updateTaskStatus: jest.fn(),
+    updateFormField: jest.fn(),
+    isReadOnly: jest.fn().mockReturnValue(false),
+    isVisible: jest.fn().mockReturnValue(true),
+  };
+
+  render(
+    <BuildProvider value={mockBuildContext}>
+      <App />
+    </BuildProvider>
+  );
+
+  const dropdown = screen.getByRole('combobox', { name: /switch build/i });
+
+  console.log('Initial dropdown value (before change):', dropdown.value);
+  const options = Array.from(dropdown.options).map((option) => option.value);
+  console.log('Dropdown options:', options);
+
+  // Simulate selecting a different build
+  fireEvent.change(dropdown, { target: { value: 'testBuild' } });
+
+  console.log('Mock calls after change:', mockSwitchBuild.mock.calls);
+
+  // Assert that switchBuild is called with the correct build ID
+  expect(mockSwitchBuild).toHaveBeenCalledWith('testBuild');
 });

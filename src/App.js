@@ -19,6 +19,7 @@ const App = () => {
   };
 
   const handleSwitchBuild = (e) => {
+    console.log('Switching Build To:', e.target.value)
     switchBuild(e.target.value);
   };
 
