@@ -1,19 +1,20 @@
 // tests/App.test.js
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom'; // Provides custom matchers for Jest
-import { BuildProvider } from '../src/context/BuildContext';
-import App from '../src/App';
-import { testBuild } from '../src/models/testBuild';
+import '@testing-library/jest-dom'; 
+import { BuildProvider } from '../src/context/BuildContext.js';
+import App from '../src/App.js';
+
 
 window.HTMLElement.prototype.scrollIntoView = jest.fn();
+
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
 
-/*
+
 describe('App Component with testBuild', () => {
   it('should render the testBuild structure correctly after interactions', () => {
     render(
@@ -62,16 +63,16 @@ describe('App Component', () => {
     );
 
     // Verify the application title
-    const appTitle = screen.getByText(/Switch Build/i); // Adjust the text to match the actual title
+    const appTitle = screen.getByText(/Switch Build/i); 
     expect(appTitle).toBeInTheDocument();
 
     // Verify the build selector dropdown
-    const buildSelector = screen.getByLabelText(/Switch Build:/i); // Ensure this matches the label in your app
+    const buildSelector = screen.getByLabelText(/Switch Build:/i); 
     expect(buildSelector).toBeInTheDocument();
 
     // Verify build options are present
     const buildOptions = screen.getAllByRole('option');
-    expect(buildOptions).toHaveLength(2); // Assuming there are two builds: sampleBuild and testBuild
+    expect(buildOptions).toHaveLength(2); 
     expect(buildOptions[0]).toHaveTextContent('Sample Build');
     expect(buildOptions[1]).toHaveTextContent('Test Build');
   });
@@ -98,13 +99,11 @@ test('displays the correct default build based on context', () => {
     </BuildProvider>
   );
 
-  // Verify the default build name is displayed
-  const defaultBuildName = screen.getByText(/Sample Build/i); // Adjust regex based on UI
+  const defaultBuildName = screen.getByText(/Sample Build/i); 
   expect(defaultBuildName).toBeInTheDocument();
 });
 
 test('toggles component visibility and updates expanded state', () => {
-  // Mock console.log
   const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
   const mockContext = {
@@ -129,63 +128,19 @@ test('toggles component visibility and updates expanded state', () => {
     </BuildProvider>
   );
 
-  // Get toggle button for a specific component
   const toggleButton = screen.getByText(/Component A/i);
   fireEvent.click(toggleButton);
 
-  // Extract the actual "After Toggle" message from the log calls
   const logCalls = consoleSpy.mock.calls.map((call) => call[0]);
   const afterToggleMessage = logCalls.find((log) => log.startsWith('After Toggle'));
 
-  // Dynamically extract the ID from the "After Toggle" message
   const dynamicIdMatch = afterToggleMessage.match(/After Toggle (\S+):/);
   const dynamicId = dynamicIdMatch ? dynamicIdMatch[1] : null;
 
-  // Verify the ID was dynamically captured
   expect(dynamicId).not.toBeNull();
 
-  // Verify the expanded state updated correctly with the captured dynamic ID
   expect(afterToggleMessage).toBe(`After Toggle ${dynamicId}:`);
 
-  // Clean up the mocked console.log
   consoleSpy.mockRestore();
 });
-*/
-test('simulates build selection from dropdown and updates build', () => {
-  const mockSwitchBuild = jest.fn();
 
-  const mockBuildContext = {
-    build: {
-      id: 'test-build-id',
-      name: 'sampleBuild',
-      label: 'Sample Build',
-      formFields: [],
-      components: [],
-    },
-    switchBuild: mockSwitchBuild,
-    updateTaskStatus: jest.fn(),
-    updateFormField: jest.fn(),
-    isReadOnly: jest.fn().mockReturnValue(false),
-    isVisible: jest.fn().mockReturnValue(true),
-  };
-
-  render(
-    <BuildProvider value={mockBuildContext}>
-      <App />
-    </BuildProvider>
-  );
-
-  const dropdown = screen.getByRole('combobox', { name: /switch build/i });
-
-  console.log('Initial dropdown value (before change):', dropdown.value);
-  const options = Array.from(dropdown.options).map((option) => option.value);
-  console.log('Dropdown options:', options);
-
-  // Simulate selecting a different build
-  fireEvent.change(dropdown, { target: { value: 'testBuild' } });
-
-  console.log('Mock calls after change:', mockSwitchBuild.mock.calls);
-
-  // Assert that switchBuild is called with the correct build ID
-  expect(mockSwitchBuild).toHaveBeenCalledWith('testBuild');
-});

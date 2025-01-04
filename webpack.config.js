@@ -64,7 +64,7 @@ export default {
             os: 'os-browserify/browser',
             path: 'path-browserify',
             vm: 'vm-browserify',
-            process: 'process/browser', // Add the process polyfill
+            process: 'process/browser', 
         },
     },
 };

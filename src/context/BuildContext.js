@@ -5,8 +5,8 @@ import { testBuild } from '../models/testBuild.js';
 
 const BuildContext = createContext();
 
-// Provider Component
-export const BuildProvider = ({ children }) => {
+
+export const BuildProvider = ({ value, children }) => {
   const builds = { sampleBuild, testBuild }; // Add new builds here
   const defaultBuildKey = process.env.NODE_ENV === 'test' ? 'testBuild' : 'sampleBuild';
   const [currentBuildKey, setCurrentBuildKey] = useState(defaultBuildKey); 
@@ -14,12 +14,11 @@ export const BuildProvider = ({ children }) => {
 
   const switchBuild = (newBuild) => {
     if (typeof newBuild === 'string') {
-      // Switch between predefined builds
+      // Predefined builds
       if (newBuild === 'sampleBuild') setBuild(sampleBuild);
       else if (newBuild === 'testBuild') setBuild(testBuild);
       else console.error('Unknown build selected:', newBuild);
     } else if (typeof newBuild === 'object') {
-      // Replace with loaded build
       setBuild(newBuild);
     } else {
       console.error('Invalid build type provided to switchBuild:', newBuild);
@@ -27,7 +26,8 @@ export const BuildProvider = ({ children }) => {
   };
   
 
-  // Update Task Status Function
+
+
   const updateTaskStatus = (componentId, taskGroupId, taskId, newStatus) => {
     setBuild((prevBuild) => {
       const updatedComponents = prevBuild.components.map((component) => {
@@ -56,7 +56,8 @@ export const BuildProvider = ({ children }) => {
     });
   };
 
-  // Update Form Field Value
+ 
+
   const updateFormField = (componentId, taskGroupId, taskId, fieldId, newValue) => {
     setBuild((prevBuild) => {
       if (!componentId) {
@@ -104,7 +105,7 @@ export const BuildProvider = ({ children }) => {
   };
   
 
-  // Helper function to derive status
+ 
   const deriveStatus = (children) => {
     const statuses = children.map((child) => child.status);
     if (statuses.every((status) => status === 'complete')) return 'complete';
@@ -112,10 +113,9 @@ export const BuildProvider = ({ children }) => {
     return 'pending';
   };
 
-  // Helper function to evaluate Read-Only
+ 
   const isReadOnly = (item, build) => {
     if (!item.readOnlyConditions) {
-        // Only log in development mode to avoid unnecessary warnings in production
         if (process.env.NODE_ENV === 'development') {
             console.warn(`No readOnlyConditions for ${item.name || item.id}`);
         }
@@ -133,7 +133,7 @@ export const BuildProvider = ({ children }) => {
   const isVisible = (item, build) => {  
     if (!item.visibilityConditions) {
       console.warn(`No visibilityConditions for ${item.name || item.id}`);
-      return true; // Default to visible if no conditions are specified
+      return true; 
     }
     if (typeof item.visibilityConditions !== 'function') {
       console.error(`Invalid visibilityConditions type for ${item.name || item.id}:`, item.visibilityConditions);
@@ -144,17 +144,21 @@ export const BuildProvider = ({ children }) => {
       return result;
     } catch (error) {
       console.error(`Error evaluating visibilityConditions for ${item.name || item.id}:`, error);
-      return true; // Fail-safe to visible
+      return true; 
     }
   };
   
+  console.log('BuildProvider value:', value);
 
   return (
-    <BuildContext.Provider value={{ build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible }}>
+    <BuildContext.Provider value={{ value, build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible }}>
       {children}
     </BuildContext.Provider>
   );
 };
 
-// Custom hook for consuming the context
-export const useBuildContext = () => useContext(BuildContext);
+export const useBuildContext = () => {
+  const context = useContext(BuildContext);
+  console.log('Context in useBuildContext:', context);
+  return context;
+};

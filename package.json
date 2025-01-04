@@ -9,7 +9,7 @@
   "scripts": {
     "start": "NODE_ENV=development webpack serve --open",
     "build": "NODE_ENV=production webpack",
-    "test": "NODE_ENV=test jest App.test.js --silent=false",
+    "test": "NODE_ENV=test jest --silent=false",
     "test:coverage": "jest --coverage"
   },
   "keywords": [],

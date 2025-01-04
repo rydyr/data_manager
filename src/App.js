@@ -1,7 +1,7 @@
 // src/App.js
 import React, { useState } from 'react';
 import { useBuildContext } from './context/BuildContext.js';
-import './App.css'; // Import the CSS file
+import './App.css'; 
 
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 
@@ -9,9 +9,10 @@ const App = () => {
   
   const { build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible } = useBuildContext();
   console.log('Build Object:', build); 
+  console.log('switchBuild function in App:', switchBuild);
   const [expandedComponents, setExpandedComponents] = useState({});
   const [expandedTaskGroups, setExpandedTaskGroups] = useState({});
-  const [buildExpanded, setBuildExpanded] = useState(false); // Track build-level expansion
+  const [buildExpanded, setBuildExpanded] = useState(false); 
 
   const handleFieldChange = (componentId, taskGroupId, taskId, fieldId, newValue) => {
     console.log('Field Change:', { componentId, taskGroupId, taskId, fieldId, newValue });
@@ -19,8 +20,9 @@ const App = () => {
   };
 
   const handleSwitchBuild = (e) => {
-    console.log('Switching Build To:', e.target.value)
-    switchBuild(e.target.value);
+    const selectedBuild = e.target.value;
+    console.log('Switching Build To:', selectedBuild)
+    switchBuild(selectedBuild);
   };
 
   const toggleComponent = (componentId) => {
@@ -73,7 +75,6 @@ const App = () => {
     return formFields.map((field) => {
       console.log(`Rendering form field: ${field.label} with testId: ${field.testId}`);
        
-        // Generate a consistent data-testid attribute
         const testId = [
             componentId && `component-${componentId}`,
             taskGroupId && `task-group-${taskGroupId}`,
@@ -163,7 +164,7 @@ const App = () => {
   };
 */}
   const saveBuildAsJSON = () => {
-    const jsonData = JSON.stringify(build, null, 2); // Beautify JSON
+    const jsonData = JSON.stringify(build, null, 2); 
     const blob = new Blob([jsonData], { type: 'application/json' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -179,7 +180,6 @@ const App = () => {
     try {
       const loadedBuild = JSON.parse(text);
 
-      // Validate the loaded build structure
       if (
         !loadedBuild.name ||
         !Array.isArray(loadedBuild.components) ||
@@ -201,7 +201,7 @@ const App = () => {
         throw new Error('Invalid build structure');
       }
 
-      switchBuild(loadedBuild); // Replace current build with loaded JSON
+      switchBuild(loadedBuild); 
     } catch (error) {
       console.error('Failed to load JSON:', error);
       alert('Failed to load JSON. Please provide a valid build file.');
