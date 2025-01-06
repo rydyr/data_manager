@@ -145,7 +145,6 @@ const App = () => {
         );
     });
 };
-{
   const renderConditions = () => {
     return (
       <div className="conditions">
@@ -162,7 +161,6 @@ const App = () => {
       </div>
     );
   };
-};
   const saveBuildAsJSON = () => {
     const jsonData = JSON.stringify(build, null, 2); 
     const blob = new Blob([jsonData], { type: 'application/json' });
