@@ -131,11 +131,11 @@ export const BuildProvider = ({ value, children }) => {
 
   
   const isVisible = (item, build) => {  
-    if (!item.visibilityConditions) {
+    if (!item.visibilityConditions && process.env.NODE_ENV === 'development') {
       console.warn(`No visibilityConditions for ${item.name || item.id}`);
       return true; 
     }
-    if (typeof item.visibilityConditions !== 'function') {
+    if (typeof item.visibilityConditions !== 'function' && process.env.NODE_ENV === 'development') {
       console.error(`Invalid visibilityConditions type for ${item.name || item.id}:`, item.visibilityConditions);
       return !!item.visibilityConditions;
     }
@@ -143,12 +143,14 @@ export const BuildProvider = ({ value, children }) => {
       const result = item.visibilityConditions(build);
       return result;
     } catch (error) {
-      console.error(`Error evaluating visibilityConditions for ${item.name || item.id}:`, error);
+      if (process.env.NODE_ENV === 'development'){
+        console.error(`Error evaluating visibilityConditions for ${item.name || item.id}:`, error);
+      }
       return true; 
     }
   };
   
-  console.log('BuildProvider value:', value);
+  //console.log('BuildProvider value:', value); //debugging log
 
   return (
     <BuildContext.Provider value={{ value, build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible }}>
@@ -159,6 +161,6 @@ export const BuildProvider = ({ value, children }) => {
 
 export const useBuildContext = () => {
   const context = useContext(BuildContext);
-  console.log('Context in useBuildContext:', context);
+  //console.log('Context in useBuildContext:', context); //debugging log
   return context;
 };

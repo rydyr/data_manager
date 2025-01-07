@@ -143,4 +143,3 @@ test('toggles component visibility and updates expanded state', () => {
 
   consoleSpy.mockRestore();
 });
-

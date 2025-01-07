@@ -8,28 +8,32 @@ console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 const App = () => {
   
   const { build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible } = useBuildContext();
-  console.log('Build Object:', build); 
-  console.log('switchBuild function in App:', switchBuild);
+  //console.log('Build Object:', build); //debugging log
+  //console.log('switchBuild function in App:', switchBuild); //debugging log
   const [expandedComponents, setExpandedComponents] = useState({});
   const [expandedTaskGroups, setExpandedTaskGroups] = useState({});
   const [buildExpanded, setBuildExpanded] = useState(false); 
 
   const handleFieldChange = (componentId, taskGroupId, taskId, fieldId, newValue) => {
-    console.log('Field Change:', { componentId, taskGroupId, taskId, fieldId, newValue });
+    //console.log('Field Change:', { componentId, taskGroupId, taskId, fieldId, newValue }); //debugging log
     updateFormField(componentId, taskGroupId, taskId, fieldId, newValue);
   };
 
   const handleSwitchBuild = (e) => {
     const selectedBuild = e.target.value;
-    console.log('Switching Build To:', selectedBuild)
+    //console.log('Switching Build To:', selectedBuild) //debugging log
     switchBuild(selectedBuild);
   };
 
   const toggleComponent = (componentId) => {
-    console.log('Before Toggle:', expandedComponents);
+    if(process.env.NODE_ENV === 'test'){
+      console.log('Before Toggle:', expandedComponents); //test log
+    }
     setExpandedComponents((prev) => {
-      const isExpanded = !prev[componentId];   
-      console.log(`After Toggle ${componentId}:`, { ...prev, [componentId]: isExpanded });
+      const isExpanded = !prev[componentId];
+      if(process.env.NODE_ENV === 'test'){
+        console.log(`After Toggle ${componentId}:`, { ...prev, [componentId]: isExpanded }); //test log
+      }   
       if (isExpanded) {
         document.getElementById(`component-${componentId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -38,10 +42,10 @@ const App = () => {
   };
 
   const toggleTaskGroup = (taskGroupId) => {
-    console.log('Toggling Task Group:', taskGroupId);
+    //console.log('Toggling Task Group:', taskGroupId); //debugging log
     setExpandedTaskGroups((prev) => {
       const isExpanded = !prev[taskGroupId];
-      console.log('Expanded State for Task Group:', taskGroupId, isExpanded);
+      //console.log('Expanded State for Task Group:', taskGroupId, isExpanded); //debugging log
       if (isExpanded) {
         document.getElementById(`taskGroup-${taskGroupId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -60,6 +64,9 @@ const App = () => {
   };
 
   const getImmediateChildStatusSummary = (children) => {
+    if (!Array.isArray(children) || children.length === 0) {
+      return '0 / 0';
+    }
     const total = children.length;
     const complete = children.filter((child) => child.status === 'complete').length;
     return `${complete} / ${total}`;
@@ -70,10 +77,10 @@ const App = () => {
 
     const { componentId = null, taskGroupId = null, taskId = null } = context;
 
-    console.log(`Rendering form fields for componentId: ${componentId}, taskGroupId: ${taskGroupId}, taskId: ${taskId}`);
+    //console.log(`Rendering form fields for componentId: ${componentId}, taskGroupId: ${taskGroupId}, taskId: ${taskId}`); //debugging log
 
     return formFields.map((field) => {
-      console.log(`Rendering form field: ${field.label} with testId: ${field.testId}`);
+      //console.log(`Rendering form field: ${field.label} with testId: ${field.testId}`); //debugging log
        
         const testId = [
             componentId && `component-${componentId}`,
@@ -83,7 +90,7 @@ const App = () => {
         ]
             .filter(Boolean)
             .join('-');
-            console.log('Generated testId:', testId);
+            //console.log('Generated testId:', testId); //debugging log
 
         return (
             <div key={field.id} style={{ marginBottom: '10px' }}>
@@ -246,10 +253,10 @@ const App = () => {
       </h2>
       {buildExpanded && renderFormFields(build.formFields)}
       {build.components.map((component) => {
-        console.log('Rendering Component:', component.name);
+        //console.log('Rendering Component:', component.name); //debugging log
         const componentVisible = isVisible(component, build);
         if (!componentVisible) {
-          console.log('Component not visible:', component.name);
+          //console.log('Component not visible:', component.name); //debugging log
           return null;
         }
   
@@ -272,14 +279,14 @@ const App = () => {
             {isComponentExpanded &&
   component.taskGroups.map((taskGroup) => {
     const taskGroupVisible = isVisible(taskGroup, build);
-    console.log(`Rendering Task Group: ${taskGroup.name}, Visible: ${taskGroupVisible}`);
+    //console.log(`Rendering Task Group: ${taskGroup.name}, Visible: ${taskGroupVisible}`); //debugging log
     if (!taskGroupVisible) return null;
 
     const taskGroupTestId = `task-group-${component.name.toLowerCase().replace(/\s+/g, '-')}-${taskGroup.name.toLowerCase().replace(/\s+/g, '-')}`;
     const isTaskGroupExpanded = expandedTaskGroups[taskGroup.id] || false;
-    console.log('Final Expanded Components State:', expandedComponents);
-    console.log('Final Expanded Task Groups State:', expandedTaskGroups);
-    console.log('Build Data:', build);
+    //console.log('Final Expanded Components State:', expandedComponents); //debugging log
+    //console.log('Final Expanded Task Groups State:', expandedTaskGroups); //debugging log
+    //console.log('Build Data:', build); //debugging log
 
 
     return (
@@ -296,7 +303,7 @@ const App = () => {
           taskGroup.tasks.map((task) => {
             const taskVisible = isVisible(task, build);
             const taskReadOnly = isReadOnly(task, build);
-            console.log(`Rendering Task: ${task.name}, Visible: ${taskVisible}`);
+            //console.log(`Rendering Task: ${task.name}, Visible: ${taskVisible}`); //debugging log
             if (!taskVisible) return null;
 
             const taskTestId = `task-${component.name.toLowerCase().replace(/\s+/g, '-')}-${taskGroup.name.toLowerCase().replace(/\s+/g, '-')}-${task.name.toLowerCase().replace(/\s+/g, '-')}`;
