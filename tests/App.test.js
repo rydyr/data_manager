@@ -16,7 +16,7 @@ beforeEach(() => {
 
 
 describe('App Component with testBuild', () => {
-  it('should render the testBuild structure correctly after interactions', () => {
+  it('should render the testBuild structure correctly after CLICK interactions', () => {
     render(
       <BuildProvider>
         <App />

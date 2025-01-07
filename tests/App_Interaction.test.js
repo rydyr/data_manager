@@ -151,6 +151,7 @@ describe('Component Interaction', () => {
       isReadOnly: jest.fn().mockReturnValue(false),
       isVisible: jest.fn().mockReturnValue(true),
     };
+    
 
     test('expands a component and renders its associated tasks', () => {
             
@@ -261,6 +262,53 @@ describe('Component Interaction', () => {
         'task-group-a1',
         'task-a1-1',
         'complete'
+      );
+    });
+    
+    test('validates visibility and read-only conditions for tasks and form fields', () => {
+      // Update mock context to handle visibility and read-only conditions
+      const enhancedContext = {
+        ...mockableBuildContext,
+        isReadOnly: jest.fn((field) => field.id === 'field-note'), // Only field-note is read-only
+        isVisible: jest.fn((taskOrField) => taskOrField.id !== 'field-status-hidden'), // Assume all fields except hidden ones are visible
+      };
+    
+      render(
+        <BuildProvider value={enhancedContext}>
+          <App />
+        </BuildProvider>
+      );
+    
+      // Expand Component A
+      const componentAToggle = screen.getByText(/Component A - Status: pending/i);
+      fireEvent.click(componentAToggle);
+    
+      // Expand Task Group A1
+      const taskGroupA1Toggle = screen.getByText(/Task Group A1 - Status: pending/i);
+      fireEvent.click(taskGroupA1Toggle);
+    
+      // Assert: Task A1.1 is visible
+      expect(screen.getByText(/Task A1.1 - Status: pending/i)).toBeInTheDocument();
+    
+      // Assert: Task A1.1 form field is read-only
+      const readOnlyField = screen.getByLabelText(/Task A1.1 Note/i);
+      expect(readOnlyField).toHaveAttribute('readOnly');
+    
+      // Assert: Task A1.2 is visible
+      expect(screen.getByText(/Task A1.2 - Status: in-progress/i)).toBeInTheDocument();
+    
+      // Assert: Task A1.2 form field is editable
+      const editableField = screen.getByLabelText(/Task A1.2 Status/i);
+      expect(editableField).not.toHaveAttribute('readOnly');
+      fireEvent.change(editableField, { target: { value: 'Complete' } });
+    
+      // Validate updateFormField is called with correct arguments
+      expect(enhancedContext.updateFormField).toHaveBeenCalledWith(
+        'component-a',
+        'task-group-a1',
+        'task-a1-2',
+        'field-status',
+        'Complete'
       );
     });
     
