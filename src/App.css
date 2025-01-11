@@ -159,3 +159,8 @@ button:hover:not(:disabled) {
   margin: 10px 0;
   text-align: center;
 }
+
+input:invalid {
+  border-color: red;
+  border-width: 2px;
+}

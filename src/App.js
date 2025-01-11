@@ -16,6 +16,16 @@ const App = () => {
 
   const handleFieldChange = (componentId, taskGroupId, taskId, fieldId, newValue) => {
     //console.log('[APP] Field Change:', { componentId, taskGroupId, taskId, fieldId, newValue }); //debugging log
+    const field = build.components
+    .find((component) => component.id === componentId)
+    ?.taskGroups.find((taskGroup) => taskGroup.id === taskGroupId)
+    ?.tasks.find((task) => task.id === taskId)
+    ?.formFields.find((f) => f.id === fieldId);
+
+  if (field && !newValue.trim()) {
+    showMessage(`The field "${field.label}" is required.`);
+    return;
+  }
     updateFormField(componentId, taskGroupId, taskId, fieldId, newValue);
   };
 
@@ -86,7 +96,8 @@ const App = () => {
 
     return formFields.map((field) => {
       //console.log(`[APP] Rendering form field: ${field.label} with testId: ${field.testId}`); //debugging log
-       
+        const isInvalid = !field.value.trim();
+
         const testId = [
             componentId && `component-${componentId}`,
             taskGroupId && `task-group-${taskGroupId}`,
