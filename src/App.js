@@ -16,16 +16,6 @@ const App = () => {
 
   const handleFieldChange = (componentId, taskGroupId, taskId, fieldId, newValue) => {
     //console.log('[APP] Field Change:', { componentId, taskGroupId, taskId, fieldId, newValue }); //debugging log
-    const field = build.components
-    .find((component) => component.id === componentId)
-    ?.taskGroups.find((taskGroup) => taskGroup.id === taskGroupId)
-    ?.tasks.find((task) => task.id === taskId)
-    ?.formFields.find((f) => f.id === fieldId);
-
-  if (field && !newValue.trim()) {
-    showMessage(`The field "${field.label}" is required.`);
-    return;
-  }
     updateFormField(componentId, taskGroupId, taskId, fieldId, newValue);
   };
 
@@ -101,7 +91,7 @@ const App = () => {
     return `${complete} / ${total}`;
   };
 
-  const renderFormFields = (formFields, context = {}, showMessage) => {
+  const renderFormFields = (formFields, context = {}) => {
     if (!Array.isArray(formFields) || formFields.length === 0) return null;
 
     const { componentId = null, taskGroupId = null, taskId = null } = context;
@@ -110,7 +100,6 @@ const App = () => {
 
     return formFields.map((field) => {
       //console.log(`[APP] Rendering form field: ${field.label} with testId: ${field.testId}`); //debugging log
-      const isInvalid = field.required && (!field.value || !field.value.trim());
 
         const testId = [
             componentId && `component-${componentId}`,
@@ -122,17 +111,11 @@ const App = () => {
             .join('-');
             //console.log('[APP] Generated testId:', testId); //debugging log
 
-          if (field.message && field.messageCondition?.(field)) {
-            showMessage({
-              message: field.message,
-              style: field.messageStyle,
-              duration: field.messageDuration,
-            });
-          }
+        const shouldShowMessage = field.message && field.messageCondition?.(field);
 
         return (
             <div key={field.id} style={{ marginBottom: '10px' }}>
-                <label htmlFor={`field-${field.id}`} style={{ color: isInvalid ? 'red' : 'inherit' }}>{field.label}</label>
+                <label htmlFor={`field-${field.id}`} style={{ color: 'inherit' }}>{field.label}</label>
                 {field.type === 'text' && (
                     <input
                         id={`field-${field.id}`}
@@ -140,13 +123,6 @@ const App = () => {
                         value={field.value}
                         readOnly={isReadOnly(field, build)}
                         onChange={(e) => {
-                          if (isInvalid) {
-                            showMessage({
-                              message: `The field "${field.label}" is required.`,
-                              style: { color: 'red' },
-                              duration: 5000,
-                            });
-                          }
                             handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
                         }}
                         data-testid={testId}
@@ -159,13 +135,6 @@ const App = () => {
                         value={field.value}
                         readOnly={isReadOnly(field, build)}
                         onChange={(e) => {
-                          if (isInvalid) {
-                            showMessage({
-                              message: `The field "${field.label}" is required.`,
-                              style: { color: 'red' },
-                              duration: 5000,
-                            });
-                          }
                             handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
                         }}
                         data-testid={testId}
@@ -178,13 +147,6 @@ const App = () => {
                         checked={field.value}
                         disabled={isReadOnly(field, build)}
                         onChange={(e) => {
-                          if (isInvalid) {
-                            showMessage({
-                              message: `The field "${field.label}" is required.`,
-                              style: { color: 'red' },
-                              duration: 5000,
-                            });
-                          }
                             handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
                         }}
                         data-testid={testId}
@@ -196,13 +158,6 @@ const App = () => {
                         value={field.value}
                         disabled={isReadOnly(field, build)}
                         onChange={(e) => {
-                          if (isInvalid) {
-                            showMessage({
-                              message: `The field "${field.label}" is required.`,
-                              style: { color: 'red' },
-                              duration: 5000,
-                            });
-                          }
                             handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
                         }}
                         data-testid={testId}
@@ -213,6 +168,17 @@ const App = () => {
                             </option>
                         ))}
                     </select>
+                )}
+                {shouldShowMessage && (
+                  <div
+                    className="field-message"
+                    style={{
+                      marginTop: '5px',
+                      ...field.messageStyle,
+                    }}
+                  >
+                    {field.message}
+                  </div>
                 )}
             </div>
         );
