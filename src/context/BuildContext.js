@@ -11,6 +11,7 @@ export const BuildProvider = ({ value, children }) => {
   const defaultBuildKey = process.env.NODE_ENV === 'test' ? 'testBuild' : 'sampleBuild';
   const [currentBuildKey, setCurrentBuildKey] = useState(defaultBuildKey); 
   const [build, setBuild] = useState(builds[currentBuildKey]);
+  const [message, setMessage] = useState(null);
 
   const switchBuild = (newBuild) => {
     if (typeof newBuild === 'string') {
@@ -161,7 +162,7 @@ export const BuildProvider = ({ value, children }) => {
   //console.log('BuildProvider value:', value); //debugging log
 
   return (
-    <BuildContext.Provider value={{ value, build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible }}>
+    <BuildContext.Provider value={{ value, build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible, message, setMessage }}>
       {children}
     </BuildContext.Provider>
   );

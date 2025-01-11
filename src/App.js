@@ -7,7 +7,7 @@ console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 
 const App = () => {
   
-  const { build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible } = useBuildContext();
+  const { build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible, message, setMessage } = useBuildContext();
   //console.log('[APP] Build Object:', build); //debugging log
   //console.log('[APP] switchBuild function in App:', switchBuild); //debugging log
   const [expandedComponents, setExpandedComponents] = useState({});
@@ -61,6 +61,11 @@ const App = () => {
       }
       return isExpanded;
     });
+  };
+
+  const showMessage = (text) => {
+    setMessage(text);
+    setTimeout(() => setMessage(null), 5000); 
   };
 
   const getImmediateChildStatusSummary = (children) => {
