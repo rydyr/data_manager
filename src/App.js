@@ -73,10 +73,24 @@ const App = () => {
     });
   };
 
-  const showMessage = (text) => {
-    setMessage(text);
-    setTimeout(() => setMessage(null), 5000); 
+  const showMessage = (options) => {
+    if (typeof options === 'string') {
+      setMessage({ text: options, style: {}, duration: 5000 });
+      setTimeout(() => setMessage(null), 5000);
+      return;
+    }
+  
+    const { message, duration = 5000, style = {}, condition = true } = options;
+  
+    if (typeof condition === 'function' ? condition() : condition) {
+      setMessage({ text: message, style, duration });
+  
+      if (duration > 0) {
+        setTimeout(() => setMessage(null), duration);
+      }
+    }
   };
+  
 
   const getImmediateChildStatusSummary = (children) => {
     if (!Array.isArray(children) || children.length === 0) {
@@ -87,7 +101,7 @@ const App = () => {
     return `${complete} / ${total}`;
   };
 
-  const renderFormFields = (formFields, context = {}) => {
+  const renderFormFields = (formFields, context = {}, showMessage) => {
     if (!Array.isArray(formFields) || formFields.length === 0) return null;
 
     const { componentId = null, taskGroupId = null, taskId = null } = context;
@@ -96,7 +110,7 @@ const App = () => {
 
     return formFields.map((field) => {
       //console.log(`[APP] Rendering form field: ${field.label} with testId: ${field.testId}`); //debugging log
-        const isInvalid = !field.value.trim();
+      const isInvalid = field.required && (!field.value || !field.value.trim());
 
         const testId = [
             componentId && `component-${componentId}`,
@@ -108,18 +122,33 @@ const App = () => {
             .join('-');
             //console.log('[APP] Generated testId:', testId); //debugging log
 
+          if (field.message && field.messageCondition?.(field)) {
+            showMessage({
+              message: field.message,
+              style: field.messageStyle,
+              duration: field.messageDuration,
+            });
+          }
+
         return (
             <div key={field.id} style={{ marginBottom: '10px' }}>
-                <label htmlFor={`field-${field.id}`}>{field.label}</label>
+                <label htmlFor={`field-${field.id}`} style={{ color: isInvalid ? 'red' : 'inherit' }}>{field.label}</label>
                 {field.type === 'text' && (
                     <input
                         id={`field-${field.id}`}
                         type="text"
                         value={field.value}
                         readOnly={isReadOnly(field, build)}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          if (isInvalid) {
+                            showMessage({
+                              message: `The field "${field.label}" is required.`,
+                              style: { color: 'red' },
+                              duration: 5000,
+                            });
+                          }
                             handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
-                        }
+                        }}
                         data-testid={testId}
                     />
                 )}
@@ -129,9 +158,16 @@ const App = () => {
                         type="number"
                         value={field.value}
                         readOnly={isReadOnly(field, build)}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          if (isInvalid) {
+                            showMessage({
+                              message: `The field "${field.label}" is required.`,
+                              style: { color: 'red' },
+                              duration: 5000,
+                            });
+                          }
                             handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
-                        }
+                        }}
                         data-testid={testId}
                     />
                 )}
@@ -141,9 +177,16 @@ const App = () => {
                         type="checkbox"
                         checked={field.value}
                         disabled={isReadOnly(field, build)}
-                        onChange={(e) =>
-                            handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.checked)
-                        }
+                        onChange={(e) => {
+                          if (isInvalid) {
+                            showMessage({
+                              message: `The field "${field.label}" is required.`,
+                              style: { color: 'red' },
+                              duration: 5000,
+                            });
+                          }
+                            handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
+                        }}
                         data-testid={testId}
                     />
                 )}
@@ -152,9 +195,16 @@ const App = () => {
                         id={`field-${field.id}`}
                         value={field.value}
                         disabled={isReadOnly(field, build)}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          if (isInvalid) {
+                            showMessage({
+                              message: `The field "${field.label}" is required.`,
+                              style: { color: 'red' },
+                              duration: 5000,
+                            });
+                          }
                             handleFieldChange(componentId, taskGroupId, taskId, field.id, e.target.value)
-                        }
+                        }}
                         data-testid={testId}
                     >
                         {field.options.map((option) => (
@@ -231,6 +281,11 @@ const App = () => {
 
   return (
     <div className="container">
+      {message && (
+      <div className="alert-message" style={message.style}>
+        {message.text}
+      </div>
+    )};
       {build.name === 'Demo Build' && renderConditions()}
       <div className="actions">
         <button onClick={saveBuildAsJSON} className="save-button">Save</button>

@@ -154,13 +154,7 @@ button:hover:not(:disabled) {
 }
 
 .alert-message {
-  color: red;
-  font-weight: bold;
   margin: 10px 0;
   text-align: center;
-}
-
-input:invalid {
-  border-color: red;
-  border-width: 2px;
+  font-weight: bold;
 }
