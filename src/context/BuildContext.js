@@ -30,31 +30,39 @@ export const BuildProvider = ({ value, children }) => {
 
   const updateTaskStatus = (componentId, taskGroupId, taskId, newStatus) => {
     setBuild((prevBuild) => {
-      const updatedComponents = prevBuild.components.map((component) => {
-        if (component.id !== componentId) return component;
+        const updatedComponents = prevBuild.components.map((component) => {
+            if (component.id !== componentId) return component;
 
-        const updatedTaskGroups = component.taskGroups.map((taskGroup) => {
-          if (taskGroup.id !== taskGroupId) return taskGroup;
+            const updatedTaskGroups = component.taskGroups.map((taskGroup) => {
+                if (taskGroup.id !== taskGroupId) return taskGroup;
 
-          const updatedTasks = taskGroup.tasks.map((task) =>
-            task.id === taskId ? { ...task, status: newStatus } : task
-          );
+                const updatedTasks = taskGroup.tasks.map((task) => {
+                    if (task.id !== taskId) return task;
 
-          const taskGroupStatus = deriveStatus(updatedTasks);
+                    if (newStatus === 'complete' && task.status !== 'in-progress') {
+                        console.warn(`${task.name} must be "in-progress" before it can be marked "complete".`);
+                        return task; 
+                    }
 
-          return { ...taskGroup, tasks: updatedTasks, status: taskGroupStatus };
+                    return { ...task, status: newStatus };
+                });
+
+                const taskGroupStatus = deriveStatus(updatedTasks);
+
+                return { ...taskGroup, tasks: updatedTasks, status: taskGroupStatus };
+            });
+
+            const componentStatus = deriveStatus(updatedTaskGroups);
+
+            return { ...component, taskGroups: updatedTaskGroups, status: componentStatus };
         });
 
-        const componentStatus = deriveStatus(updatedTaskGroups);
+        const buildStatus = deriveStatus(updatedComponents);
 
-        return { ...component, taskGroups: updatedTaskGroups, status: componentStatus };
-      });
-
-      const buildStatus = deriveStatus(updatedComponents);
-
-      return { ...prevBuild, components: updatedComponents, status: buildStatus };
+        return { ...prevBuild, components: updatedComponents, status: buildStatus };
     });
-  };
+};
+
 
  
 
