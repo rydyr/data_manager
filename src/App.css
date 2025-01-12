@@ -164,3 +164,22 @@ button:hover:not(:disabled) {
   font-size: 14px;
   color: inherit;
 }
+
+.field-group.read-only {
+  opacity: 0.6;
+  pointer-events: none; /* Prevent interactions */
+  cursor: not-allowed;
+}
+
+.field-group h3.disabled {
+  pointer-events: none;
+  color: grey;
+}
+
+.field-group h3 {
+  font-size: 1rem; 
+  font-weight: bold; 
+  color: #333; 
+  margin: 10px 0; 
+  cursor: pointer; 
+}

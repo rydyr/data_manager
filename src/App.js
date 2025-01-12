@@ -182,24 +182,39 @@ const App = () => {
 const renderGroupedFormFields = (formFields) => {
   const groupedFields = formFields.reduce((acc, field) => {
     const groupKey = field.group || 'ungrouped';
-    const groupLabel = field.groupLabel || groupKey; 
-    if (!acc[groupKey]) acc[groupKey] = { label: groupLabel, fields: [] };
+    const groupLabel = field.groupLabel || groupKey;
+    if (!acc[groupKey]) {
+      acc[groupKey] = {
+        label: groupLabel,
+        fields: [],
+        readOnlyConditions: field.groupReadOnlyConditions,
+        visibilityConditions: field.groupVisibilityConditions,
+      };
+    }
     acc[groupKey].fields.push(field);
     return acc;
   }, {});
 
-  return Object.entries(groupedFields).map(([groupKey, { label, fields }]) => {
+  return Object.entries(groupedFields).map(([groupKey, { label, fields, readOnlyConditions, visibilityConditions }]) => {
+   
+    const isVisible = visibilityConditions ? visibilityConditions(build) : true;
+    if (!isVisible) return null; 
+
+    const isReadOnly = readOnlyConditions ? readOnlyConditions(build) : false;
+
     const isGroupExpanded = expandedFieldGroups[groupKey] || false;
 
     return (
-      <div key={groupKey} className="field-group">
+      <div key={groupKey} className={`field-group ${isReadOnly ? 'read-only' : ''}`}>
         {groupKey !== 'ungrouped' && (
-          <h3 onClick={() => toggleFieldGroup(groupKey)} className="expandable">
+          <h3 onClick={() => !isReadOnly && toggleFieldGroup(groupKey)} className={`expandable ${isReadOnly ? 'disabled' : ''}`}>
             {label} {isGroupExpanded ? '▼' : '▶'}
           </h3>
         )}
         {isGroupExpanded || groupKey === 'ungrouped'
-          ? renderFormFields(fields) 
+          ? renderFormFields(
+              fields.map((field) => ({ ...field, readOnlyConditions: isReadOnly || field.readOnlyConditions })) // Propagate read-only
+            )
           : null}
       </div>
     );

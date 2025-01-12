@@ -2,8 +2,8 @@
 import { createBuild, createComponent, createTaskGroup, createTask, createFormField } from './Schema.js';
 
 export const sampleBuild = createBuild('Demo Build', [
-  createFormField('text', 'Provide Build Description', [],null,null,null,null,null,null,'one','demo fields'),
-  createFormField('number', 'Estimated Completion Time (Days)',[],null,null,null,null,null,null,'one','demo fields'),
+  createFormField('text', 'Provide Build Description', [],null,null,null,null,null,null,'one','demo fields', null, (build) => build.status !== "pending"),
+  createFormField('number', 'Estimated Completion Time (Days)',[],null,null,null,null,null,null,'one','demo fields', null, (build) => build.status !== "pending"),
 ], [
   createComponent(
     'Component A',
