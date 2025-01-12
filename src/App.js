@@ -1,6 +1,7 @@
 // src/App.js
 import React, { useState } from 'react';
 import { useBuildContext } from './context/BuildContext.js';
+import showMessage from './util/showMessage.js';
 import './App.css'; 
 
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -62,24 +63,6 @@ const App = () => {
       return isExpanded;
     });
   };
-
-  const showMessage = ({
-    message,
-    duration = 5000,
-    style = {},
-    onClear = null
-  }) => {
-    if(!message) return;
-
-    setMessage({text: message, style});
-
-    if (duration > 0) {
-      setTimeout(() => {
-        setMessage(null);
-        if(onClear) onClear();
-      }, duration);
-    }
-  } 
   
 
   const getImmediateChildStatusSummary = (children) => {
@@ -248,10 +231,10 @@ const App = () => {
   return (
     <div className="container">
       {message && (
-      <div className="alert-message" style={message.style}>
-        {message.text}
-      </div>
-    )};
+        <div className='field-message' style={message.style}>
+          {message.text}
+        </div>
+      )}
       {build.name === 'Demo Build' && renderConditions()}
       <div className="actions">
         <button onClick={saveBuildAsJSON} className="save-button">Save</button>

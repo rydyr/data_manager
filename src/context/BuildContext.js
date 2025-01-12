@@ -2,6 +2,7 @@
 import React, { createContext, useState, useContext } from 'react';
 import { sampleBuild } from '../models/sampleBuild.js';
 import { testBuild } from '../models/testBuild.js';
+import showMessage from '../util/showMessage.js';
 
 const BuildContext = createContext();
 
@@ -29,7 +30,7 @@ export const BuildProvider = ({ value, children }) => {
 
 
 
-  const updateTaskStatus = (componentId, taskGroupId, taskId, newStatus) => {
+  const updateTaskStatus = (componentId, taskGroupId, taskId, newStatus, setMessage) => {
     setBuild((prevBuild) => {
         const updatedComponents = prevBuild.components.map((component) => {
             if (component.id !== componentId) return component;
@@ -42,6 +43,13 @@ export const BuildProvider = ({ value, children }) => {
 
                     if (newStatus === 'complete' && task.status !== 'in-progress') {
                         console.warn(`${task.name} must be "in-progress" before it can be marked "complete".`);
+                        showMessage({
+                          message: `${task.name} must be "in-progress" before it can be marked "complete".`,
+                          style: {color: 'orange', fontWeight: 'bold'},
+                          duration: 0,
+                        },
+                      setMessage
+                    );
                         return task; 
                     }
 
