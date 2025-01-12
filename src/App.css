@@ -16,7 +16,7 @@ h1, h2, h3 {
 
 h2, h3 {
   cursor: pointer;
-  font-size: 20px; /* Increased font size for touch screens */
+  font-size: 20px; 
   padding: 10px;
 }
 
@@ -27,22 +27,22 @@ h2:hover, h3:hover {
 /* Task styles */
 .task {
   margin-left: 40px;
-  padding: 15px; /* Increased padding for touch screens */
+  padding: 15px; 
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 5px;
-  font-size: 18px; /* Increased font size for readability */
+  font-size: 18px; 
 }
 
 /* Buttons */
 button {
-  margin: 10px; /* Increased margin for better spacing */
-  padding: 10px 15px; /* Increased padding for larger touch targets */
-  font-size: 16px; /* Increased font size for readability */
+  margin: 10px; 
+  padding: 10px 15px; 
+  font-size: 16px;
   background-color: #007BFF;
   color: white;
   border: none;
-  border-radius: 5px; /* Larger border radius for a softer look */
+  border-radius: 5px; 
   cursor: pointer;
 }
 
@@ -61,15 +61,15 @@ button:hover:not(:disabled) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 20px; /* Increased font size for touch screens */
-  padding: 10px; /* Added padding for touch-friendly design */
-  background-color: #f5f5f5; /* Subtle background for headers */
+  font-size: 20px; 
+  padding: 10px; 
+  background-color: #f5f5f5; 
   border-radius: 5px;
 }
 
 .expandable:hover {
   color: #82a8e0;
-  background-color: #e8f0fe; /* Subtle hover background */
+  background-color: #e8f0fe;
 }
 
 /* Conditions Section */
@@ -81,7 +81,7 @@ button:hover:not(:disabled) {
   padding-right: 20px;
   background-color: #f0f0f0;
   border-left: 4px solid #007BFF;
-  font-size: 16px; /* Increased font size for readability */
+  font-size: 16px; 
 }
 
 .conditions ul {
@@ -90,7 +90,7 @@ button:hover:not(:disabled) {
 }
 
 .conditions li {
-  margin: 10px 0; /* Increased spacing for better readability */
+  margin: 10px 0; 
 }
 
 /* Responsive Design for Smaller Screens */
@@ -123,9 +123,9 @@ button:hover:not(:disabled) {
   border: none;
   border-radius: 5px;
   font-size: 16px;
-  position: relative; /* Required for positioning the input inside */
+  position: relative; 
   cursor: pointer;
-  overflow: hidden; /* Ensures input doesn't extend beyond button */
+  overflow: hidden; 
 }
 
 .upload-button:hover {
@@ -167,7 +167,7 @@ button:hover:not(:disabled) {
 
 .field-group.read-only {
   opacity: 0.6;
-  pointer-events: none; /* Prevent interactions */
+  pointer-events: none; 
   cursor: not-allowed;
 }
 

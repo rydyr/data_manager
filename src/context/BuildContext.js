@@ -2,13 +2,14 @@
 import React, { createContext, useState, useContext } from 'react';
 import { sampleBuild } from '../models/sampleBuild.js';
 import { testBuild } from '../models/testBuild.js';
+import { exampleBuild } from '../models/exampleBuild.js';
 
 
 const BuildContext = createContext();
 
 
 export const BuildProvider = ({ value, children }) => {
-  const builds = { sampleBuild, testBuild }; // Add new builds here
+  const builds = { sampleBuild, testBuild, exampleBuild }; // Add new builds here
   const defaultBuildKey = process.env.NODE_ENV === 'test' ? 'testBuild' : 'sampleBuild';
   const [currentBuildKey, setCurrentBuildKey] = useState(defaultBuildKey); 
   const [build, setBuild] = useState(builds[currentBuildKey]);
@@ -19,6 +20,7 @@ export const BuildProvider = ({ value, children }) => {
       // Predefined builds
       if (newBuild === 'sampleBuild') setBuild(sampleBuild);
       else if (newBuild === 'testBuild') setBuild(testBuild);
+      else if (newBuild === 'exampleBuild') setBuild(exampleBuild);
       else console.error('Unknown build selected:', newBuild);
     } else if (typeof newBuild === 'object') {
       setBuild(newBuild);

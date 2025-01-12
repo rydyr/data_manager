@@ -318,6 +318,7 @@ const renderGroupedFormFields = (formFields) => {
       <select id="build-selector" onChange={handleSwitchBuild}>
         <option value="sampleBuild">Sample Build</option>
         <option value="testBuild">Test Build</option>
+        <option value="exampleBuild">Pencil Builder</option>
       </select>
       <h1 data-testid="build-status">{build.name} - Status: {build.status}</h1>
       <h2

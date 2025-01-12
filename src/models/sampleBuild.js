@@ -17,7 +17,7 @@ export const sampleBuild = createBuild('Demo Build', [
           createTask(
             'Task A1.1',
             [
-              createFormField('text', 'Name This Task'),
+              createFormField('text', 'Name This Task',[],null,null,null,'message',() => true,{color: 'blue'}),
               createFormField('checkbox', 'Is Task A1.1 Completed?'),
             ],
             null, // No read-only condition
