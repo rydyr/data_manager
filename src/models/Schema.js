@@ -2,7 +2,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 
-const createFormField = (type, label, options = [], readOnlyConditions = null, visibilityConditions = null, testId = null, message = null, messageCondition = null, messageStyle = {}, messageDuration = 5000) => {
+const createFormField = (type, label, options = [], readOnlyConditions = null, visibilityConditions = null, testId = null, message = null, messageCondition = null, messageStyle = {}) => {
   const validFieldTypes = ['text', 'number', 'checkbox', 'dropdown'];
   if (!validFieldTypes.includes(type)) {
     throw new Error(`Invalid field type: ${type}`);
@@ -19,7 +19,6 @@ const createFormField = (type, label, options = [], readOnlyConditions = null, v
     message,
     messageCondition,
     messageStyle,
-    messageDuration,
   };
 };
 

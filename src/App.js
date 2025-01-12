@@ -1,7 +1,6 @@
 // src/App.js
 import React, { useState } from 'react';
 import { useBuildContext } from './context/BuildContext.js';
-import showMessage from './util/showMessage.js';
 import './App.css'; 
 
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -356,7 +355,7 @@ const App = () => {
                   </button>
                 </div>
                 {message[task.id] && (
-                  <div style={{ marginTop: '10px', ...message[task.id].style }}>
+                  <div style={{ marginTop: '10px', marginBottom: '10px', ...message[task.id].style }}>
                     {message[task.id].text}
                   </div>
                 )}

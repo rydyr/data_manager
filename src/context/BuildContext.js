@@ -2,7 +2,7 @@
 import React, { createContext, useState, useContext } from 'react';
 import { sampleBuild } from '../models/sampleBuild.js';
 import { testBuild } from '../models/testBuild.js';
-import showMessage from '../util/showMessage.js';
+
 
 const BuildContext = createContext();
 
@@ -47,7 +47,7 @@ export const BuildProvider = ({ value, children }) => {
                           ...prevMessages,
                           [taskId]: {
                             text: `${task.name} must be "in-progress" before it can be marked "complete".`,
-                            style: {color: 'red', marginBottom: '10px'}
+                            style: {color: 'red'}
                           },
                         }));
 
