@@ -43,13 +43,13 @@ export const BuildProvider = ({ value, children }) => {
 
                     if (newStatus === 'complete' && task.status !== 'in-progress') {
                         console.warn(`${task.name} must be "in-progress" before it can be marked "complete".`);
-                        showMessage({
-                          message: `${task.name} must be "in-progress" before it can be marked "complete".`,
-                          style: {color: 'orange', fontWeight: 'bold'},
-                          duration: 0,
-                        },
-                      setMessage
-                    );
+                        setMessage((prevMessages) => ({
+                          ...prevMessages,
+                          [taskId]: {
+                            text: `${task.name} must be "in-progress" before it can be marked "complete".`,
+                            style: {color: 'red'}
+                          },
+                        }))
                         return task; 
                     }
 
