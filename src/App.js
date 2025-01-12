@@ -63,23 +63,23 @@ const App = () => {
     });
   };
 
-  const showMessage = (options) => {
-    if (typeof options === 'string') {
-      setMessage({ text: options, style: {}, duration: 5000 });
-      setTimeout(() => setMessage(null), 5000);
-      return;
+  const showMessage = ({
+    message,
+    duration = 5000,
+    style = {},
+    onClear = null
+  }) => {
+    if(!message) return;
+
+    setMessage({text: message, style});
+
+    if (duration > 0) {
+      setTimeout(() => {
+        setMessage(null);
+        if(onClear) onClear();
+      }, duration);
     }
-  
-    const { message, duration = 5000, style = {}, condition = true } = options;
-  
-    if (typeof condition === 'function' ? condition() : condition) {
-      setMessage({ text: message, style, duration });
-  
-      if (duration > 0) {
-        setTimeout(() => setMessage(null), duration);
-      }
-    }
-  };
+  } 
   
 
   const getImmediateChildStatusSummary = (children) => {
@@ -374,7 +374,7 @@ const App = () => {
                   componentId: component.id,
                   taskGroupId: taskGroup.id,
                   taskId: task.id,
-                })}
+                }, showMessage)}
               </div>
             );
           })}

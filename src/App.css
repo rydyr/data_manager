@@ -158,3 +158,9 @@ button:hover:not(:disabled) {
   text-align: center;
   font-weight: bold;
 }
+
+.field-message {
+  margin-top: 5px;
+  font-size: 14px;
+  color: inherit;
+}

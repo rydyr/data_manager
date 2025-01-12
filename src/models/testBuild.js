@@ -26,7 +26,7 @@ export const testBuild = createBuild(
             createTask(
               'Task A1.1',
               [
-                createFormField('text', 'Task A1.1 Note', [], null, () => true, 'task-a1-1-note',  "Complete This Field",(field) => field.value === '',  { color: 'orange', fontWeight: 'bold' }, 0),
+                createFormField('text', 'Task A1.1 Note', [], null, () => true, 'task-a1-1-note',  "Complete This Field",() => true,  { color: 'orange', fontWeight: 'bold' }, 0),
                 createFormField('checkbox', 'Task A1.1 Complete', [], null, () => true, 'task-a1-1-complete'),
               ],
               null,
