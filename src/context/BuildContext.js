@@ -12,7 +12,7 @@ export const BuildProvider = ({ value, children }) => {
   const defaultBuildKey = process.env.NODE_ENV === 'test' ? 'testBuild' : 'sampleBuild';
   const [currentBuildKey, setCurrentBuildKey] = useState(defaultBuildKey); 
   const [build, setBuild] = useState(builds[currentBuildKey]);
-  const [message, setMessage] = useState(null);
+  const [messages, setMessages] = useState({});
 
   const switchBuild = (newBuild) => {
     if (typeof newBuild === 'string') {
@@ -43,13 +43,21 @@ export const BuildProvider = ({ value, children }) => {
 
                     if (newStatus === 'complete' && task.status !== 'in-progress') {
                         console.warn(`${task.name} must be "in-progress" before it can be marked "complete".`);
-                        setMessage((prevMessages) => ({
+                        setMessages((prevMessages) => ({
                           ...prevMessages,
                           [taskId]: {
                             text: `${task.name} must be "in-progress" before it can be marked "complete".`,
-                            style: {color: 'red'}
+                            style: {color: 'red', marginBottom: '10px'}
                           },
-                        }))
+                        }));
+
+                        setTimeout(() => {
+                          setMessages((prevMessages) => {
+                            const newMessages = { ...prevMessages };
+                            delete newMessages[taskId];
+                            return newMessages;
+                          })
+                        },5000)
                         return task; 
                     }
 
@@ -170,7 +178,7 @@ export const BuildProvider = ({ value, children }) => {
   //console.log('BuildProvider value:', value); //debugging log
 
   return (
-    <BuildContext.Provider value={{ value, build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible, message, setMessage }}>
+    <BuildContext.Provider value={{ value, build, switchBuild, updateTaskStatus, updateFormField, isReadOnly, isVisible, message: messages, setMessage: setMessages, }}>
       {children}
     </BuildContext.Provider>
   );

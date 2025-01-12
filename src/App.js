@@ -14,6 +14,8 @@ const App = () => {
   const [expandedComponents, setExpandedComponents] = useState({});
   const [expandedTaskGroups, setExpandedTaskGroups] = useState({});
   const [buildExpanded, setBuildExpanded] = useState(false); 
+ 
+
 
   const handleFieldChange = (componentId, taskGroupId, taskId, fieldId, newValue) => {
     //console.log('[APP] Field Change:', { componentId, taskGroupId, taskId, fieldId, newValue }); //debugging log
@@ -353,11 +355,16 @@ const App = () => {
                     Set Complete
                   </button>
                 </div>
+                {message[task.id] && (
+                  <div style={{ marginTop: '10px', ...message[task.id].style }}>
+                    {message[task.id].text}
+                  </div>
+                )}
                 {renderFormFields(task.formFields, {
                   componentId: component.id,
                   taskGroupId: taskGroup.id,
                   taskId: task.id,
-                }, showMessage)}
+                })}
               </div>
             );
           })}
