@@ -12,7 +12,9 @@ const App = () => {
   //console.log('[APP] switchBuild function in App:', switchBuild); //debugging log
   const [expandedComponents, setExpandedComponents] = useState({});
   const [expandedTaskGroups, setExpandedTaskGroups] = useState({});
+  const [expandedFieldGroups, setExpandedFieldGroups] = useState({});
   const [buildExpanded, setBuildExpanded] = useState(false); 
+  
  
 
 
@@ -54,6 +56,14 @@ const App = () => {
       return { ...prev, [taskGroupId]: isExpanded };
     });
   };
+
+  const toggleFieldGroup = (groupId) => {
+    setExpandedFieldGroups((prev) => ({
+      ...prev,
+      [groupId]: !prev[groupId],
+    }));
+  };
+  
 
   const toggleBuild = () => {
     setBuildExpanded((prev) => {
@@ -168,6 +178,37 @@ const App = () => {
         );
     });
 };
+
+const renderGroupedFormFields = (formFields) => {
+  const groupedFields = formFields.reduce((acc, field) => {
+    const groupKey = field.group || 'ungrouped';
+    const groupLabel = field.groupLabel || groupKey; 
+    if (!acc[groupKey]) acc[groupKey] = { label: groupLabel, fields: [] };
+    acc[groupKey].fields.push(field);
+    return acc;
+  }, {});
+
+  return Object.entries(groupedFields).map(([groupKey, { label, fields }]) => {
+    const isGroupExpanded = expandedFieldGroups[groupKey] || false;
+
+    return (
+      <div key={groupKey} className="field-group">
+        {groupKey !== 'ungrouped' && (
+          <h3 onClick={() => toggleFieldGroup(groupKey)} className="expandable">
+            {label} {isGroupExpanded ? '▼' : '▶'}
+          </h3>
+        )}
+        {isGroupExpanded || groupKey === 'ungrouped'
+          ? renderFormFields(fields) 
+          : null}
+      </div>
+    );
+  });
+};
+
+
+
+
   const renderConditions = () => {
     return (
       <div className="conditions">
@@ -272,7 +313,7 @@ const App = () => {
       >
         {build.name} - Form Fields {buildExpanded ? '▼' : '▶'}
       </h2>
-      {buildExpanded && renderFormFields(build.formFields)}
+      {buildExpanded && renderGroupedFormFields(build.formFields)} 
       {build.components.map((component) => {
         //console.log('[APP] Rendering Component:', component.name); //debugging log
         const componentVisible = isVisible(component, build);
@@ -296,7 +337,7 @@ const App = () => {
               {component.name} - Status: {component.status} ({getImmediateChildStatusSummary(component.taskGroups)})
               {isComponentExpanded ? ' ▼' : ' ▶'}
             </h2>
-            {isComponentExpanded && renderFormFields(component.formFields, { componentId: component.id })}
+            {isComponentExpanded && renderGroupedFormFields(component.formFields, { componentId: component.id })}
             {isComponentExpanded &&
   component.taskGroups.map((taskGroup) => {
     const taskGroupVisible = isVisible(taskGroup, build);
