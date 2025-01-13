@@ -85,52 +85,78 @@ export const BuildProvider = ({ value, children }) => {
 
  
 
-  const updateFormField = (componentId, taskGroupId, taskId, fieldId, newValue) => {
-    setBuild((prevBuild) => {
-      if (!componentId) {
-        // Build-level fields
-        const updatedFormFields = prevBuild.formFields.map((field) =>
-          field.id === fieldId ? { ...field, value: newValue } : field
-        );
-        return { ...prevBuild, formFields: updatedFormFields };
-      }
-  
-      // Component-level and below
-      const updatedComponents = prevBuild.components.map((component) => {
-        if (component.id !== componentId) return component;
-  
-        if (!taskGroupId) {
-          // Component-level fields
-          const updatedFormFields = component.formFields.map((field) =>
-            field.id === fieldId ? { ...field, value: newValue } : field
-          );
-          return { ...component, formFields: updatedFormFields };
+const updateFormField = (componentId, taskGroupId, taskId, fieldId, newValue) => {
+  console.log('--- updateFormField called ---');
+  console.log('Arguments:', { componentId, taskGroupId, taskId, fieldId, newValue });
+
+  setBuild((prevBuild) => {
+    let updatedBuild = { ...prevBuild }; // Clone the build for immutability
+
+    if (!componentId) {
+      console.log('[DEBUG] Updating build-level field');
+      // Build-level fields
+      updatedBuild.formFields = prevBuild.formFields.map((field) => {
+        if (field.id === fieldId) {
+          console.log(`[DEBUG] Updating build-level field ${fieldId} with value ${newValue}`);
+          return { ...field, value: newValue };
         }
-  
-        // Task group-level and task-level fields
-        const updatedTaskGroups = component.taskGroups.map((taskGroup) => {
-          if (taskGroup.id !== taskGroupId) return taskGroup;
-  
-          const updatedTasks = taskGroup.tasks.map((task) => {
-            if (task.id !== taskId) return task;
-  
-            const updatedFields = task.formFields.map((field) =>
-              field.id === fieldId ? { ...field, value: newValue } : field
-            );
-  
-            return { ...task, formFields: updatedFields };
-          });
-  
-          return { ...taskGroup, tasks: updatedTasks };
-        });
-  
-        return { ...component, taskGroups: updatedTaskGroups };
+        return field;
       });
-  
-      return { ...prevBuild, components: updatedComponents };
+      console.log('[DEBUG] Updated build-level formFields:', updatedBuild.formFields);
+      return updatedBuild;
+    }
+
+    // Component-level and below
+    updatedBuild.components = prevBuild.components.map((component) => {
+      if (component.id !== componentId) return component;
+
+      console.log(`[DEBUG] Found target componentId: ${componentId}`);
+
+      if (!taskGroupId) {
+        // Component-level fields
+        console.log('[DEBUG] Updating component-level field');
+        component.formFields = component.formFields.map((field) => {
+          if (field.id === fieldId) {
+            console.log(`[DEBUG] Updating component-level field ${fieldId} with value ${newValue}`);
+            return { ...field, value: newValue };
+          }
+          return field;
+        });
+        console.log('[DEBUG] Updated component-level formFields:', component.formFields);
+        return component;
+      }
+
+      // Task group-level and task-level fields
+      component.taskGroups = component.taskGroups.map((taskGroup) => {
+        if (taskGroup.id !== taskGroupId) return taskGroup;
+
+        console.log(`[DEBUG] Found target taskGroupId: ${taskGroupId}`);
+
+        taskGroup.tasks = taskGroup.tasks.map((task) => {
+          if (task.id !== taskId) return task;
+
+          console.log(`[DEBUG] Found target taskId: ${taskId}`);
+
+          task.formFields = task.formFields.map((field) => {
+            if (field.id === fieldId) {
+              console.log(`[DEBUG] Updating task-level field ${fieldId} with value ${newValue}`);
+              return { ...field, value: newValue };
+            }
+            return field;
+          });
+          console.log('[DEBUG] Updated task-level formFields:', task.formFields);
+          return task;
+        });
+        return taskGroup;
+      });
+      return component;
     });
-  };
-  
+
+    console.log('[DEBUG] Updated build structure:', JSON.stringify(updatedBuild, null, 2));
+    return updatedBuild;
+  });
+};
+
 
  
   const deriveStatus = (children) => {

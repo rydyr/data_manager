@@ -20,6 +20,13 @@ const App = () => {
 
   const handleFieldChange = (componentId, taskGroupId, taskId, fieldId, newValue) => {
     console.log('[APP] Field Change:', { componentId, taskGroupId, taskId, fieldId, newValue }); //debugging log
+    console.log('[DEBUG] Field Change Context:', {
+      componentId,
+      taskGroupId,
+      taskId,
+      fieldId,
+      newValue,
+    });
     updateFormField(componentId, taskGroupId, taskId, fieldId, newValue);
   };
 
@@ -104,6 +111,8 @@ const App = () => {
             .filter(Boolean)
             .join('-');
             //console.log('[APP] Generated testId:', testId); //debugging log
+            console.log(`[DEBUG] Rendering field: ${field.label}, context:`, context);
+
 
         const shouldShowMessage = field.message && field.messageCondition?.(field);
 
