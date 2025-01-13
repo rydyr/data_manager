@@ -52,7 +52,7 @@ export const exampleBuild = createBuild('Make Pencil ', [
     createComponent('Eraser',
         [
             // form fields
-            createFormField('dropdown','Eraser Color', ['pink','white','blue','green'])
+            createFormField('dropdown','Eraser Color ',['pink','white','blue','green'])
         ],
         [
             // task groups

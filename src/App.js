@@ -19,7 +19,7 @@ const App = () => {
 
 
   const handleFieldChange = (componentId, taskGroupId, taskId, fieldId, newValue) => {
-    //console.log('[APP] Field Change:', { componentId, taskGroupId, taskId, fieldId, newValue }); //debugging log
+    console.log('[APP] Field Change:', { componentId, taskGroupId, taskId, fieldId, newValue }); //debugging log
     updateFormField(componentId, taskGroupId, taskId, fieldId, newValue);
   };
 
