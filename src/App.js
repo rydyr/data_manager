@@ -188,7 +188,8 @@ const App = () => {
     });
 };
 
-const renderGroupedFormFields = (formFields) => {
+const renderGroupedFormFields = (formFields, parentContext = {}) => {
+  // Group the fields by their group key
   const groupedFields = formFields.reduce((acc, field) => {
     const groupKey = field.group || 'ungrouped';
     const groupLabel = field.groupLabel || groupKey;
@@ -204,32 +205,33 @@ const renderGroupedFormFields = (formFields) => {
     return acc;
   }, {});
 
+  // Map over each group and render its fields
   return Object.entries(groupedFields).map(([groupKey, { label, fields, readOnlyConditions, visibilityConditions }]) => {
-   
-    const isVisible = visibilityConditions ? visibilityConditions(build) : true;
-    if (!isVisible) return null; 
+    const isVisible = visibilityConditions ? visibilityConditions(parentContext.build) : true;
+    if (!isVisible) return null; // Skip rendering if the group is not visible
 
-    const isReadOnly = readOnlyConditions ? readOnlyConditions(build) : false;
+    const isReadOnly = readOnlyConditions ? readOnlyConditions(parentContext.build) : false;
 
-    const isGroupExpanded = expandedFieldGroups[groupKey] || false;
+    const isGroupExpanded = parentContext.expandedFieldGroups[groupKey] || false;
 
     return (
       <div key={groupKey} className={`field-group ${isReadOnly ? 'read-only' : ''}`}>
         {groupKey !== 'ungrouped' && (
-          <h3 onClick={() => !isReadOnly && toggleFieldGroup(groupKey)} className={`expandable ${isReadOnly ? 'disabled' : ''}`}>
+          <h3
+            onClick={() => !isReadOnly && parentContext.toggleFieldGroup(groupKey)}
+            className={`expandable ${isReadOnly ? 'disabled' : ''}`}
+          >
             {label} {isGroupExpanded ? '▼' : '▶'}
           </h3>
         )}
-        {isGroupExpanded || groupKey === 'ungrouped'
-          ? renderFormFields(
-              fields.map((field) => ({ ...field, readOnlyConditions: isReadOnly || field.readOnlyConditions })) // Propagate read-only
-            )
-          : null}
+        {(isGroupExpanded || groupKey === 'ungrouped') && (
+          // Pass the context along with each field
+          renderFormFields(fields, parentContext)
+        )}
       </div>
     );
   });
 };
-
 
 
 
@@ -338,7 +340,14 @@ const renderGroupedFormFields = (formFields) => {
       >
         {build.name} - Form Fields {buildExpanded ? '▼' : '▶'}
       </h2>
-      {buildExpanded && renderGroupedFormFields(build.formFields)} 
+      {buildExpanded && renderGroupedFormFields(build.formFields, {
+        componentId: null,
+        taskGroupId: null,
+        taskId: null,
+        build,
+        expandedFieldGroups,
+        toggleFieldGroup,
+      })} 
       {build.components.map((component) => {
         //console.log('[APP] Rendering Component:', component.name); //debugging log
         const componentVisible = isVisible(component, build);
@@ -362,7 +371,14 @@ const renderGroupedFormFields = (formFields) => {
               {component.name} - Status: {component.status} ({getImmediateChildStatusSummary(component.taskGroups)})
               {isComponentExpanded ? ' ▼' : ' ▶'}
             </h2>
-            {isComponentExpanded && renderGroupedFormFields(component.formFields, { componentId: component.id })}
+            {isComponentExpanded && renderGroupedFormFields(component.formFields, { 
+              componentId: component.id,
+              taskGroupId: null,
+              taskId: null,
+              build,
+              expandedFieldGroups,
+              toggleFieldGroup,
+             })}
             {isComponentExpanded &&
   component.taskGroups.map((taskGroup) => {
     const taskGroupVisible = isVisible(taskGroup, build);
@@ -387,6 +403,15 @@ const renderGroupedFormFields = (formFields) => {
           {isTaskGroupExpanded ? ' ▼' : ' ▶'}
         </h3>
         {isTaskGroupExpanded &&
+                renderGroupedFormFields(taskGroup.formFields, {
+                  componentId: component.id,
+                  taskGroupId: taskGroup.id,
+                  taskId: null,
+                  build,
+                  expandedFieldGroups,
+                  toggleFieldGroup,
+        })}
+        {isTaskGroupExpanded &&
           taskGroup.tasks.map((task) => {
             const taskVisible = isVisible(task, build);
             const taskReadOnly = isReadOnly(task, build);
@@ -400,6 +425,14 @@ const renderGroupedFormFields = (formFields) => {
                 <p>
                   {task.name} - Status: {task.status}
                 </p>
+                {renderGroupedFormFields(task.formFields, {
+                        componentId: component.id,
+                        taskGroupId: taskGroup.id,
+                        taskId: task.id,
+                        build,
+                        expandedFieldGroups,
+                        toggleFieldGroup,
+                      })}
                 <div>
                   <button
                     onClick={() => updateTaskStatus(component.id, taskGroup.id, task.id, 'pending')}
