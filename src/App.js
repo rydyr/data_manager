@@ -403,15 +403,6 @@ const renderGroupedFormFields = (formFields, parentContext = {}) => {
           {isTaskGroupExpanded ? ' ▼' : ' ▶'}
         </h3>
         {isTaskGroupExpanded &&
-                renderGroupedFormFields(taskGroup.formFields, {
-                  componentId: component.id,
-                  taskGroupId: taskGroup.id,
-                  taskId: null,
-                  build,
-                  expandedFieldGroups,
-                  toggleFieldGroup,
-        })}
-        {isTaskGroupExpanded &&
           taskGroup.tasks.map((task) => {
             const taskVisible = isVisible(task, build);
             const taskReadOnly = isReadOnly(task, build);
@@ -458,11 +449,11 @@ const renderGroupedFormFields = (formFields, parentContext = {}) => {
                     {message[task.id].text}
                   </div>
                 )}
-                {renderFormFields(task.formFields, {
+                {/*renderFormFields(task.formFields, {
                   componentId: component.id,
                   taskGroupId: taskGroup.id,
                   taskId: task.id,
-                })}
+                })*/}
               </div>
             );
           })}
