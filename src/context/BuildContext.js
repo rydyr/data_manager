@@ -32,55 +32,78 @@ export const BuildProvider = ({ value, children }) => {
 
 
 
-  const updateTaskStatus = (componentId, taskGroupId, taskId, newStatus, setMessage) => {
+  const updateTaskStatus = (componentId, taskGroupId, taskId, newStatus) => {
     setBuild((prevBuild) => {
-        const updatedComponents = prevBuild.components.map((component) => {
-            if (component.id !== componentId) return component;
+      const updatedComponents = prevBuild.components.map((component) => {
+        if (component.id !== componentId) return component;
 
-            const updatedTaskGroups = component.taskGroups.map((taskGroup) => {
-                if (taskGroup.id !== taskGroupId) return taskGroup;
+        const updatedTaskGroups = component.taskGroups.map((taskGroup) => {
+          if (taskGroup.id !== taskGroupId) return taskGroup;
 
-                const updatedTasks = taskGroup.tasks.map((task) => {
-                    if (task.id !== taskId) return task;
+          const updatedTasks = taskGroup.tasks.map((task) => {
+            if (task.id !== taskId) return task;
 
-                    if (newStatus === 'complete' && task.status !== 'in-progress') {
-                        console.warn(`${task.name} must be "in-progress" before it can be marked "complete".`);
-                        setMessages((prevMessages) => ({
-                          ...prevMessages,
-                          [taskId]: {
-                            text: `${task.name} must be "in-progress" before it can be marked "complete".`,
-                            style: {color: 'red'}
-                          },
-                        }));
+            if (newStatus === 'complete') {
+              
+              if (task.completionConditions && !task.completionConditions(prevBuild)) {
+                console.warn(`${task.name} cannot be marked "complete" due to unmet conditions.`);
+                setMessages((prevMessages) => ({
+                  ...prevMessages,
+                  [taskId]: {
+                    text: `${task.name} cannot be marked "complete" due to unmet conditions.`,
+                    style: { color: 'red' },
+                  },
+                }));
 
-                        setTimeout(() => {
-                          setMessages((prevMessages) => {
-                            const newMessages = { ...prevMessages };
-                            delete newMessages[taskId];
-                            return newMessages;
-                          })
-                        },5000)
-                        return task; 
-                    }
+                setTimeout(() => {
+                  setMessages((prevMessages) => {
+                    const newMessages = { ...prevMessages };
+                    delete newMessages[taskId];
+                    return newMessages;
+                  });
+                }, 5000);
+                return task; 
+              }
 
-                    return { ...task, status: newStatus };
-                });
+              if (task.status !== 'in-progress') {
+                console.warn(`${task.name} must be "in-progress" before it can be marked "complete".`);
+                setMessages((prevMessages) => ({
+                  ...prevMessages,
+                  [taskId]: {
+                    text: `${task.name} must be "in-progress" before it can be marked "complete".`,
+                    style: { color: 'red' },
+                  },
+                }));
 
-                const taskGroupStatus = deriveStatus(updatedTasks);
+                setTimeout(() => {
+                  setMessages((prevMessages) => {
+                    const newMessages = { ...prevMessages };
+                    delete newMessages[taskId];
+                    return newMessages;
+                  });
+                }, 5000);
+                return task; 
+              }
+            }
 
-                return { ...taskGroup, tasks: updatedTasks, status: taskGroupStatus };
-            });
+            return { ...task, status: newStatus };
+          });
 
-            const componentStatus = deriveStatus(updatedTaskGroups);
+          const taskGroupStatus = deriveStatus(updatedTasks);
 
-            return { ...component, taskGroups: updatedTaskGroups, status: componentStatus };
+          return { ...taskGroup, tasks: updatedTasks, status: taskGroupStatus };
         });
 
-        const buildStatus = deriveStatus(updatedComponents);
+        const componentStatus = deriveStatus(updatedTaskGroups);
 
-        return { ...prevBuild, components: updatedComponents, status: buildStatus };
+        return { ...component, taskGroups: updatedTaskGroups, status: componentStatus };
+      });
+
+      const buildStatus = deriveStatus(updatedComponents);
+
+      return { ...prevBuild, components: updatedComponents, status: buildStatus };
     });
-};
+  };
 
 
  
