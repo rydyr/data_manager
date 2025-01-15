@@ -3,6 +3,7 @@ import React, { createContext, useState, useContext } from 'react';
 import { sampleBuild } from '../models/sampleBuild.js';
 import { testBuild } from '../models/testBuild.js';
 import { exampleBuild } from '../models/exampleBuild.js';
+import { evaluateTaskTransition } from '../utils/taskEvaluator.js';
 
 
 const BuildContext = createContext();
@@ -43,77 +44,54 @@ export const BuildProvider = ({ value, children }) => {
           const updatedTasks = taskGroup.tasks.map((task) => {
             if (task.id !== taskId) return task;
   
-            if (newStatus === 'complete') {
-              
-              if (task.status !== 'in-progress') {
-                const message = `${task.name} must be "in-progress" before it can be marked "complete".`;
-                console.warn(message);
-                setMessages((prevMessages) => ({
-                  ...prevMessages,
-                  [taskId]: {
-                    text: message,
-                    style: { color: 'red' },
-                  },
-                }));
+            // Skip if the task is already in the target status
+            if (task.status === newStatus) return task;
   
-                setTimeout(() => {
-                  setMessages((prevMessages) => {
-                    const newMessages = { ...prevMessages };
-                    delete newMessages[taskId];
-                    return newMessages;
-                  });
-                }, 5000);
+            // Evaluate transition conditions
+            const { success, message } = evaluateTaskTransition(
+              prevBuild,
+              component.name,
+              taskGroup.name,
+              task.name,
+              newStatus,
+              newStatus === 'complete' ? task.completionConditions || [] : []
+            );
   
-                return task; 
-              }
+            if (!success) {
+              console.warn(message);
+              setMessages((prevMessages) => ({
+                ...prevMessages,
+                [taskId]: { text: message, style: { color: 'red' } },
+              }));
   
-              
-              if (task.completionConditions) {
-                const { success, message } = task.completionConditions(prevBuild);
+              setTimeout(() => {
+                setMessages((prevMessages) => {
+                  const newMessages = { ...prevMessages };
+                  delete newMessages[taskId];
+                  return newMessages;
+                });
+              }, 5000);
   
-                if (!success) {
-                  console.warn(message);
-                  setMessages((prevMessages) => ({
-                    ...prevMessages,
-                    [taskId]: {
-                      text: message,
-                      style: { color: 'red' },
-                    },
-                  }));
-  
-                  setTimeout(() => {
-                    setMessages((prevMessages) => {
-                      const newMessages = { ...prevMessages };
-                      delete newMessages[taskId];
-                      return newMessages;
-                    });
-                  }, 5000);
-  
-                  return task; 
-                }
-              }
+              return task; // Skip updating the status
             }
   
             return { ...task, status: newStatus };
           });
   
-          const taskGroupStatus = deriveStatus(updatedTasks);
-  
-          return { ...taskGroup, tasks: updatedTasks, status: taskGroupStatus };
+          // Dynamically update readOnlyConditions based on task status
+          return {
+            ...taskGroup,
+            tasks: updatedTasks,
+          };
         });
   
-        const componentStatus = deriveStatus(updatedTaskGroups);
-  
-        return { ...component, taskGroups: updatedTaskGroups, status: componentStatus };
+        return { ...component, taskGroups: updatedTaskGroups };
       });
   
-      const buildStatus = deriveStatus(updatedComponents);
-  
-      return { ...prevBuild, components: updatedComponents, status: buildStatus };
+      return { ...prevBuild, components: updatedComponents };
     });
   };
   
-
  
 
 const updateFormField = (componentId, taskGroupId, taskId, fieldId, newValue) => {
