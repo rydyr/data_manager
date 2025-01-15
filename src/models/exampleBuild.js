@@ -1,5 +1,7 @@
 // src/models/exampleBuild.js
-import { createBuild, createComponent, createTaskGroup, createTask, createFormField } from './Schema.js';
+import { createBuild, createComponent, createTaskGroup, createTask, createFormField } from '../utils/Schema.js';
+import { evaluateConditions } from '../utils/conditionAggregator.js';
+import { taskComplete, fieldFilled } from '../utils/conditions.js';
 
 export const exampleBuild = createBuild(
   'Pencil Build',
@@ -26,16 +28,16 @@ export const exampleBuild = createBuild(
           [
             createTask('Select Barrel Material', []),
             createTask('Inspect Material', [createFormField('text', 'Inspector Name')]),
-            createTask('Cut Material', [
-                createFormField('number', 'Length to Cut (cm)')
-            ],
-            null,
-            null,
-            (build) => build.components
-                .find(c => c.name === 'Barrel')
-                .taskGroups.find(g => g.name === 'Material Preparation')
-                .tasks.find(t => t.name === 'Inspect Material').status === 'complete'
-        ),
+            createTask(
+              'Cut Material',
+              [createFormField('number', 'Length to Cut (cm)')],
+              null,
+              null,
+              (build) =>
+                evaluateConditions(build, [
+                  taskComplete('Barrel', 'Material Preparation', 'Inspect Material'),
+                ])
+            ),
           ]
         ),
         createTaskGroup(
@@ -48,10 +50,10 @@ export const exampleBuild = createBuild(
               null,
               null,
               (build) =>
-                build.components
-                  .find(c => c.name === 'Barrel')
-                  .taskGroups.find(g => g.name === 'Material Preparation')
-                  .tasks.find(t => t.name === 'Cut Material').status === 'complete'
+                evaluateConditions(build, [
+                  taskComplete('Barrel', 'Material Preparation', 'Cut Material'),
+                  fieldFilled('Barrel', 'Barrel Assembly', 'Assemble Barrel', 'Assembly Notes'),
+                ])
             ),
             createTask('Quality Check', [
               createFormField('text', 'Quality Assurance Officer'),
@@ -81,10 +83,9 @@ export const exampleBuild = createBuild(
               null,
               null,
               (build) =>
-                build.components
-                  .find(c => c.name === 'Core')
-                  .taskGroups.find(g => g.name === 'Core Production')
-                  .tasks.find(t => t.name === 'Mold Core').status === 'complete'
+                evaluateConditions(build, [
+                  taskComplete('Core', 'Core Production', 'Mold Core'),
+                ])
             ),
           ]
         ),
@@ -101,10 +102,10 @@ export const exampleBuild = createBuild(
               null,
               null,
               (build) =>
-                build.components
-                  .find(c => c.name === 'Core')
-                  .taskGroups.find(g => g.name === 'Core Testing')
-                  .tasks.find(t => t.name === 'Stress Test').status === 'complete'
+                evaluateConditions(build, [
+                  taskComplete('Core', 'Core Testing', 'Stress Test'),
+                  fieldFilled('Core', 'Core Testing', 'Finalize Core', 'Core Approved'),
+                ])
             ),
           ]
         ),
@@ -135,7 +136,9 @@ export const exampleBuild = createBuild(
               null,
               null,
               (build) =>
-                build.components.find(c => c.name === 'Core').status === 'complete'
+                evaluateConditions(build, [
+                  taskComplete('Core', 'Core Production', 'Refine Core'),
+                ])
             ),
             createTask('Final Eraser Test', [
               createFormField('text', 'Tester Name'),
@@ -163,10 +166,10 @@ export const exampleBuild = createBuild(
               null,
               null,
               (build) =>
-                build.components
-                  .find(c => c.name === 'Barrel')
-                  .taskGroups.find(g => g.name === 'Barrel Assembly')
-                  .tasks.find(t => t.name === 'Quality Check').status === 'complete'
+                evaluateConditions(build, [
+                  taskComplete('Barrel', 'Barrel Assembly', 'Quality Check'),
+                  fieldFilled('Paint', 'Paint Application', 'Apply Paint', 'Color'),
+                ])
             ),
             createTask('Dry Paint', [createFormField('number', 'Drying Time (hours)')]),
           ]
@@ -176,10 +179,9 @@ export const exampleBuild = createBuild(
           [
             createTask('Inspect Paint Finish', [createFormField('checkbox', 'Finish Approved')]),
             createTask('Apply Clear Coat', [], null, null, (build) =>
-              build.components
-                .find(c => c.name === 'Paint')
-                .taskGroups.find(g => g.name === 'Paint Inspection')
-                .tasks.find(t => t.name === 'Inspect Paint Finish').status === 'complete'
+              evaluateConditions(build, [
+                taskComplete('Paint', 'Paint Inspection', 'Inspect Paint Finish'),
+              ])
             ),
           ]
         ),

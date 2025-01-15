@@ -5,7 +5,7 @@ import {
   createTaskGroup,
   createTask,
   createFormField,
-} from './Schema.js';
+} from '../utils/Schema.js';
 
 export const testBuild = createBuild(
   'Test Build',

@@ -36,7 +36,7 @@ const createTask = (name, formFields = [], readOnlyConditions = null, visibility
   formFields,
   readOnlyConditions: readOnlyConditions || null,
   visibilityConditions: visibilityConditions || null,
-  completionConditions: completionConditions || null,
+  completionConditions: completionConditions || (() => ({success: true, message: ''})),
   testId,
 });
 

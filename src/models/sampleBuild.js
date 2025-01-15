@@ -1,5 +1,5 @@
 // src/models/sampleBuild.js
-import { createBuild, createComponent, createTaskGroup, createTask, createFormField } from './Schema.js';
+import { createBuild, createComponent, createTaskGroup, createTask, createFormField } from '../utils/Schema.js';
 
 export const sampleBuild = createBuild('Demo Build', [
   createFormField('text', 'Provide Build Description', [],null,null,null,null,null,null,'one','demo fields', null, (build) => build.status !== "pending"),

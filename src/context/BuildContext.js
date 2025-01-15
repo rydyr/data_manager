@@ -36,25 +36,26 @@ export const BuildProvider = ({ value, children }) => {
     setBuild((prevBuild) => {
       const updatedComponents = prevBuild.components.map((component) => {
         if (component.id !== componentId) return component;
-
+  
         const updatedTaskGroups = component.taskGroups.map((taskGroup) => {
           if (taskGroup.id !== taskGroupId) return taskGroup;
-
+  
           const updatedTasks = taskGroup.tasks.map((task) => {
             if (task.id !== taskId) return task;
-
+  
             if (newStatus === 'complete') {
               
-              if (task.completionConditions && !task.completionConditions(prevBuild)) {
-                console.warn(`${task.name} cannot be marked "complete" due to unmet conditions.`);
+              if (task.status !== 'in-progress') {
+                const message = `${task.name} must be "in-progress" before it can be marked "complete".`;
+                console.warn(message);
                 setMessages((prevMessages) => ({
                   ...prevMessages,
                   [taskId]: {
-                    text: `${task.name} cannot be marked "complete" due to unmet conditions.`,
+                    text: message,
                     style: { color: 'red' },
                   },
                 }));
-
+  
                 setTimeout(() => {
                   setMessages((prevMessages) => {
                     const newMessages = { ...prevMessages };
@@ -62,49 +63,56 @@ export const BuildProvider = ({ value, children }) => {
                     return newMessages;
                   });
                 }, 5000);
+  
                 return task; 
               }
-
-              if (task.status !== 'in-progress') {
-                console.warn(`${task.name} must be "in-progress" before it can be marked "complete".`);
-                setMessages((prevMessages) => ({
-                  ...prevMessages,
-                  [taskId]: {
-                    text: `${task.name} must be "in-progress" before it can be marked "complete".`,
-                    style: { color: 'red' },
-                  },
-                }));
-
-                setTimeout(() => {
-                  setMessages((prevMessages) => {
-                    const newMessages = { ...prevMessages };
-                    delete newMessages[taskId];
-                    return newMessages;
-                  });
-                }, 5000);
-                return task; 
+  
+              
+              if (task.completionConditions) {
+                const { success, message } = task.completionConditions(prevBuild);
+  
+                if (!success) {
+                  console.warn(message);
+                  setMessages((prevMessages) => ({
+                    ...prevMessages,
+                    [taskId]: {
+                      text: message,
+                      style: { color: 'red' },
+                    },
+                  }));
+  
+                  setTimeout(() => {
+                    setMessages((prevMessages) => {
+                      const newMessages = { ...prevMessages };
+                      delete newMessages[taskId];
+                      return newMessages;
+                    });
+                  }, 5000);
+  
+                  return task; 
+                }
               }
             }
-
+  
             return { ...task, status: newStatus };
           });
-
+  
           const taskGroupStatus = deriveStatus(updatedTasks);
-
+  
           return { ...taskGroup, tasks: updatedTasks, status: taskGroupStatus };
         });
-
+  
         const componentStatus = deriveStatus(updatedTaskGroups);
-
+  
         return { ...component, taskGroups: updatedTaskGroups, status: componentStatus };
       });
-
+  
       const buildStatus = deriveStatus(updatedComponents);
-
+  
       return { ...prevBuild, components: updatedComponents, status: buildStatus };
     });
   };
-
+  
 
  
 
@@ -113,7 +121,7 @@ const updateFormField = (componentId, taskGroupId, taskId, fieldId, newValue) =>
   console.log('Arguments:', { componentId, taskGroupId, taskId, fieldId, newValue });
 
   setBuild((prevBuild) => {
-    let updatedBuild = { ...prevBuild }; // Clone the build for immutability
+    let updatedBuild = { ...prevBuild }; 
 
     if (!componentId) {
       console.log('[DEBUG] Updating build-level field');
