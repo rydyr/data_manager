@@ -1,15 +1,14 @@
-// src/models/exampleBuild.js
-import { 
-  createBuild, 
-  createComponent, 
-  createTaskGroup, 
-  createTask, 
-  createFormField 
+import {
+  createBuild,
+  createComponent,
+  createTaskGroup,
+  createTask,
+  createFormField,
 } from '../utils/Schema.js';
 
-import { 
-  taskReadyForCompletion, 
-  taskReadyForProgress 
+import {
+  taskReadyForCompletion,
+  taskReadyForProgress,
 } from '../utils/conditions.js';
 
 export const exampleBuild = createBuild(
@@ -41,7 +40,7 @@ export const exampleBuild = createBuild(
               [createFormField('text', 'Inspector Name')],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Material Preparation', 'Select Barrel Material'),
+                  taskReadyForProgress('Barrel', 'Material Preparation', 'Select Barrel Material', true),
                 ],
               }
             ),
@@ -50,7 +49,7 @@ export const exampleBuild = createBuild(
               [createFormField('number', 'Length to Cut (cm)')],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Material Preparation', 'Inspect Material'),
+                  taskReadyForProgress('Barrel', 'Material Preparation', 'Inspect Material', true),
                 ],
               }
             ),
@@ -64,7 +63,7 @@ export const exampleBuild = createBuild(
               [createFormField('checkbox', 'Edges Smooth?')],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Material Preparation', 'Cut Material'),
+                  taskReadyForProgress('Barrel', 'Material Preparation', 'Cut Material', true),
                 ],
               }
             ),
@@ -73,10 +72,10 @@ export const exampleBuild = createBuild(
               [createFormField('text', 'Assembly Notes')],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Barrel Assembly', 'Sand Barrel Edges'),
+                  taskReadyForProgress('Barrel', 'Barrel Assembly', 'Sand Barrel Edges', true),
                 ],
                 completionConditions: [
-                  taskReadyForCompletion('Barrel', 'Barrel Assembly', 'Assemble Barrel'),
+                  taskReadyForCompletion('Barrel', 'Barrel Assembly', 'Assemble Barrel', 'all'),
                 ],
               }
             ),
@@ -88,7 +87,7 @@ export const exampleBuild = createBuild(
               ],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Barrel Assembly', 'Assemble Barrel'),
+                  taskReadyForProgress('Barrel', 'Barrel Assembly', 'Assemble Barrel', true),
                 ],
               }
             ),
@@ -114,7 +113,7 @@ export const exampleBuild = createBuild(
               [createFormField('text', 'Mold Technician Name')],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Core', 'Core Production', 'Mix Materials'),
+                  taskReadyForProgress('Core', 'Core Production', 'Mix Materials', true),
                 ],
               }
             ),
@@ -123,7 +122,7 @@ export const exampleBuild = createBuild(
               [createFormField('number', 'Refinement Time (minutes)')],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Core', 'Core Production', 'Mold Core'),
+                  taskReadyForProgress('Core', 'Core Production', 'Mold Core', true),
                 ],
               }
             ),
@@ -141,10 +140,10 @@ export const exampleBuild = createBuild(
               [createFormField('checkbox', 'Core Approved')],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Core', 'Core Testing', 'Stress Test'),
+                  taskReadyForProgress('Core', 'Core Testing', 'Stress Test', true),
                 ],
                 completionConditions: [
-                  taskReadyForCompletion('Core', 'Core Testing', 'Finalize Core'),
+                  taskReadyForCompletion('Core', 'Core Testing', 'Finalize Core', 'array', ['Core Approved']),
                 ],
               }
             ),
@@ -170,7 +169,7 @@ export const exampleBuild = createBuild(
               [createFormField('dropdown', 'Color', ['Pink', 'White', 'Blue'])],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Eraser', 'Eraser Production', 'Cut Eraser Shape'),
+                  taskReadyForProgress('Eraser', 'Eraser Production', 'Cut Eraser Shape', true),
                 ],
               }
             ),
@@ -184,7 +183,7 @@ export const exampleBuild = createBuild(
               [],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Core', 'Core Production', 'Refine Core'),
+                  taskReadyForProgress('Core', 'Core Production', 'Refine Core', true),
                 ],
               }
             ),
@@ -196,7 +195,7 @@ export const exampleBuild = createBuild(
               ],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Eraser', 'Attachment Process', 'Attach Eraser'),
+                  taskReadyForProgress('Eraser', 'Attachment Process', 'Attach Eraser', true),
                 ],
               }
             ),
@@ -221,10 +220,10 @@ export const exampleBuild = createBuild(
               [createFormField('dropdown', 'Color', ['Yellow', 'Red', 'Green', 'Blue'])],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Barrel Assembly', 'Quality Check'),
+                  taskReadyForProgress('Barrel', 'Barrel Assembly', 'Quality Check', true),
                 ],
                 completionConditions: [
-                  taskReadyForCompletion('Paint', 'Paint Application', 'Apply Paint'),
+                  taskReadyForCompletion('Paint', 'Paint Application', 'Apply Paint', 'all'),
                 ],
               }
             ),
@@ -233,7 +232,7 @@ export const exampleBuild = createBuild(
               [createFormField('number', 'Drying Time (hours)')],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Paint', 'Paint Application', 'Apply Paint'),
+                  taskReadyForProgress('Paint', 'Paint Application', 'Apply Paint', true),
                 ],
               }
             ),
@@ -248,7 +247,7 @@ export const exampleBuild = createBuild(
               [],
               {
                 inProgressConditions: [
-                  taskReadyForProgress('Paint', 'Paint Inspection', 'Inspect Paint Finish'),
+                  taskReadyForProgress('Paint', 'Paint Inspection', 'Inspect Paint Finish', true),
                 ],
               }
             ),
