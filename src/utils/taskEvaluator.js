@@ -1,3 +1,4 @@
+//src/utils/taskEvaluator.js
 export const evaluateTaskTransition = (
     build,
     componentName,
@@ -8,8 +9,9 @@ export const evaluateTaskTransition = (
   ) => {
     const conditions = [];
   
-    console.log(`Evaluating transition for ${taskName} to ${newStatus}`);
+    console.log(`Evaluating transition for "${taskName}" to "${newStatus}"`);
   
+    // Add conditions based on new status
     if (newStatus === 'in-progress') {
       conditions.push((build) => {
         const task = build.components
@@ -21,17 +23,14 @@ export const evaluateTaskTransition = (
           return { success: false, message: `Task "${taskName}" not found.` };
         }
   
-        return task.status === 'complete'
+        return task.status === 'pending'
           ? { success: true, message: '' }
-          : { success: false, message: `Task "${taskName}" must be marked as complete.` };
+          : { success: false, message: `Task "${taskName}" must start from "pending".` };
       });
     }
   
     if (newStatus === 'complete') {
-      // Add additional completion conditions
-      if (Array.isArray(additionalConditions)) {
-        conditions.push(...additionalConditions);
-      }
+      conditions.push(...additionalConditions);
     }
   
     // Evaluate all conditions
@@ -39,15 +38,15 @@ export const evaluateTaskTransition = (
       .map((condition) => condition(build))
       .filter((result) => !result.success);
   
-    console.log('Failed conditions:', failedConditions);
-  
     if (failedConditions.length > 0) {
+      console.error(`Failed conditions for "${taskName}":`, failedConditions);
       return {
         success: false,
         message: failedConditions.map((c) => c.message).join(' '),
       };
     }
   
+    console.log(`Transition for "${taskName}" to "${newStatus}" successful.`);
     return { success: true, message: '' };
   };
   

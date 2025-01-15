@@ -74,20 +74,22 @@ export const BuildProvider = ({ value, children }) => {
   
               return task; // Skip updating the status
             }
-  
+            console.log('[updateTaskStatus] Updating Task:', task.name, 'to Status:', newStatus);
             return { ...task, status: newStatus };
           });
   
-          // Dynamically update readOnlyConditions based on task status
+          console.log('[updateTaskStatus] Updated Tasks for TaskGroup:', taskGroup.name, updatedTasks);
           return {
             ...taskGroup,
             tasks: updatedTasks,
           };
         });
-  
+       
+        console.log('[updateTaskStatus] Updated TaskGroups for Component:', component.name, updatedTaskGroups);
         return { ...component, taskGroups: updatedTaskGroups };
       });
   
+      console.log('[updateTaskStatus] Final Updated Build:', updatedComponents);
       return { ...prevBuild, components: updatedComponents };
     });
   };
