@@ -1,41 +1,37 @@
-//src/utils/taskEvaluator.js
-import { taskReadyForProgress, taskReadyForCompletion } from './conditions.js';
+import { evaluateCondition } from "./conditionEvaluator.js";
 
-export const evaluateTaskTransition = (
-  build,
-  componentName,
-  taskGroupName,
-  taskName,
-  newStatus,
-  additionalConditions = []
-) => {
-  const conditions = [];
+const findTask = (build, componentName, taskGroupName, taskName) => {
+  const component = build.components.find((c) => c.name === componentName);
+  if (!component) return { success: false, message: `Component "${componentName}" not found.` };
+
+  const taskGroup = component.taskGroups.find((g) => g.name === taskGroupName);
+  if (!taskGroup) return { success: false, message: `Task group "${taskGroupName}" not found.` };
+
+  const task = taskGroup.tasks.find((t) => t.name === taskName);
+  if (!task) return { success: false, message: `Task "${taskName}" not found.` };
+
+  return { success: true, task, component, taskGroup };
+};
+
+export const evaluateTaskTransition = (build, componentName, taskGroupName, taskName, newStatus) => {
   console.log(`Evaluating transition for "${taskName}" to "${newStatus}"`);
 
-  if (newStatus === 'in-progress') {
-    conditions.push(taskReadyForProgress(componentName, taskGroupName, taskName));
-  }
+  const { success, task, message } = findTask(build, componentName, taskGroupName, taskName);
+  if (!success) return { success: false, message };
 
-  if (newStatus === 'complete') {
-    conditions.push(taskReadyForCompletion(componentName, taskGroupName, taskName));
-    if (Array.isArray(additionalConditions)) {
-      conditions.push(...additionalConditions);
-    }
-  }
+  const conditions = newStatus === "in-progress" ? task.inProgressConditions : task.completionConditions;
+  if (!conditions?.length) return { success: true, message: "" };
 
-  // Evaluate all conditions
   const failedConditions = conditions
-    .map((condition) => condition(build))
+    .map((condition) => evaluateCondition(condition.type, ...condition.params)(build))
     .filter((result) => !result.success);
 
   if (failedConditions.length > 0) {
-    console.error(`Failed conditions for "${taskName}":`, failedConditions);
     return {
       success: false,
-      message: failedConditions.map((c) => c.message).join(' '),
+      message: failedConditions.map((c) => c.message).join(" "),
     };
   }
 
-  console.log(`Transition for "${taskName}" to "${newStatus}" successful.`);
-  return { success: true, message: '' };
+  return { success: true, message: "" };
 };

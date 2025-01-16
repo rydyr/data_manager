@@ -6,11 +6,6 @@ import {
   createFormField,
 } from '../utils/Schema.js';
 
-import {
-  taskReadyForCompletion,
-  taskReadyForProgress,
-} from '../utils/conditions.js';
-
 export const exampleBuild = createBuild(
   'Pencil Build',
   [
@@ -34,24 +29,23 @@ export const exampleBuild = createBuild(
         createTaskGroup(
           'Material Preparation',
           [
-            createTask('Select Barrel Material', []),
+            createTask(
+              'Select Barrel Material',
+              [],
+              null, // No conditions for in-progress
+              null, // No conditions for completion
+            ),
             createTask(
               'Inspect Material',
               [createFormField('text', 'Inspector Name')],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Material Preparation', 'Select Barrel Material', true),
-                ],
-              }
+              { type: 'in-progress', params: ['Barrel', 'Material Preparation', 'Select Barrel Material'] },
+              null, // No conditions for completion
             ),
             createTask(
               'Cut Material',
               [createFormField('number', 'Length to Cut (cm)')],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Material Preparation', 'Inspect Material', true),
-                ],
-              }
+              { type: 'in-progress', params: ['Barrel', 'Material Preparation', 'Inspect Material'] },
+              null, // No conditions for completion
             ),
           ]
         ),
@@ -61,23 +55,14 @@ export const exampleBuild = createBuild(
             createTask(
               'Sand Barrel Edges',
               [createFormField('checkbox', 'Edges Smooth?')],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Material Preparation', 'Cut Material', true),
-                ],
-              }
+              { type: 'in-progress', params: ['Barrel', 'Material Preparation', 'Cut Material'] },
+              null, // No conditions for completion
             ),
             createTask(
               'Assemble Barrel',
               [createFormField('text', 'Assembly Notes')],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Barrel Assembly', 'Sand Barrel Edges', true),
-                ],
-                completionConditions: [
-                  taskReadyForCompletion('Barrel', 'Barrel Assembly', 'Assemble Barrel', 'all'),
-                ],
-              }
+              { type: 'in-progress', params: ['Barrel', 'Barrel Assembly', 'Sand Barrel Edges'] },
+              { type: 'completion', params: ['Barrel', 'Barrel Assembly', 'Assemble Barrel', 'all'] },
             ),
             createTask(
               'Quality Check',
@@ -85,11 +70,8 @@ export const exampleBuild = createBuild(
                 createFormField('text', 'Quality Assurance Officer'),
                 createFormField('checkbox', 'Approved?'),
               ],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Barrel Assembly', 'Assemble Barrel', true),
-                ],
-              }
+              { type: 'in-progress', params: ['Barrel', 'Barrel Assembly', 'Assemble Barrel'] },
+              null, // No conditions for completion
             ),
           ]
         ),
@@ -111,41 +93,30 @@ export const exampleBuild = createBuild(
             createTask(
               'Mold Core',
               [createFormField('text', 'Mold Technician Name')],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Core', 'Core Production', 'Mix Materials', true),
-                ],
-              }
+              { type: 'in-progress', params: ['Core', 'Core Production', 'Mix Materials'] },
             ),
             createTask(
               'Refine Core',
               [createFormField('number', 'Refinement Time (minutes)')],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Core', 'Core Production', 'Mold Core', true),
-                ],
-              }
+              { type: 'in-progress', params: ['Core', 'Core Production', 'Mold Core'] },
             ),
           ]
         ),
         createTaskGroup(
           'Core Testing',
           [
-            createTask('Stress Test', [
-              createFormField('text', 'Tester Name'),
-              createFormField('number', 'Test Pressure (kg/cm²)'),
-            ]),
+            createTask(
+              'Stress Test',
+              [
+                createFormField('text', 'Tester Name'),
+                createFormField('number', 'Test Pressure (kg/cm²)'),
+              ]
+            ),
             createTask(
               'Finalize Core',
               [createFormField('checkbox', 'Core Approved')],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Core', 'Core Testing', 'Stress Test', true),
-                ],
-                completionConditions: [
-                  taskReadyForCompletion('Core', 'Core Testing', 'Finalize Core', 'array', ['Core Approved']),
-                ],
-              }
+              { type: 'in-progress', params: ['Core', 'Core Testing', 'Stress Test'] },
+              { type: 'completion', params: ['Core', 'Core Testing', 'Finalize Core', 'array', ['Core Approved']] },
             ),
           ]
         ),
@@ -163,15 +134,14 @@ export const exampleBuild = createBuild(
         createTaskGroup(
           'Eraser Production',
           [
-            createTask('Cut Eraser Shape', [createFormField('dropdown', 'Shape', ['Round', 'Square', 'Custom'])]),
+            createTask(
+              'Cut Eraser Shape',
+              [createFormField('dropdown', 'Shape', ['Round', 'Square', 'Custom'])],
+            ),
             createTask(
               'Color Eraser',
               [createFormField('dropdown', 'Color', ['Pink', 'White', 'Blue'])],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Eraser', 'Eraser Production', 'Cut Eraser Shape', true),
-                ],
-              }
+              { type: 'in-progress', params: ['Eraser', 'Eraser Production', 'Cut Eraser Shape'] },
             ),
           ]
         ),
@@ -181,11 +151,7 @@ export const exampleBuild = createBuild(
             createTask(
               'Attach Eraser',
               [],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Core', 'Core Production', 'Refine Core', true),
-                ],
-              }
+              { type: 'in-progress', params: ['Core', 'Core Production', 'Refine Core'] },
             ),
             createTask(
               'Final Eraser Test',
@@ -193,11 +159,7 @@ export const exampleBuild = createBuild(
                 createFormField('text', 'Tester Name'),
                 createFormField('checkbox', 'Passed Test?'),
               ],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Eraser', 'Attachment Process', 'Attach Eraser', true),
-                ],
-              }
+              { type: 'in-progress', params: ['Eraser', 'Attachment Process', 'Attach Eraser'] },
             ),
           ]
         ),
@@ -218,23 +180,13 @@ export const exampleBuild = createBuild(
             createTask(
               'Apply Paint',
               [createFormField('dropdown', 'Color', ['Yellow', 'Red', 'Green', 'Blue'])],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Barrel', 'Barrel Assembly', 'Quality Check', true),
-                ],
-                completionConditions: [
-                  taskReadyForCompletion('Paint', 'Paint Application', 'Apply Paint', 'all'),
-                ],
-              }
+              { type: 'in-progress', params: ['Barrel', 'Barrel Assembly', 'Quality Check'] },
+              { type: 'completion', params: ['Paint', 'Paint Application', 'Apply Paint', 'all'] },
             ),
             createTask(
               'Dry Paint',
               [createFormField('number', 'Drying Time (hours)')],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Paint', 'Paint Application', 'Apply Paint', true),
-                ],
-              }
+              { type: 'in-progress', params: ['Paint', 'Paint Application', 'Apply Paint'] },
             ),
           ]
         ),
@@ -245,11 +197,7 @@ export const exampleBuild = createBuild(
             createTask(
               'Apply Clear Coat',
               [],
-              {
-                inProgressConditions: [
-                  taskReadyForProgress('Paint', 'Paint Inspection', 'Inspect Paint Finish', true),
-                ],
-              }
+              { type: 'in-progress', params: ['Paint', 'Paint Inspection', 'Inspect Paint Finish'] },
             ),
           ]
         ),

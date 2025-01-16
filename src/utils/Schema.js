@@ -50,7 +50,7 @@ const createTaskGroup = (name, tasks = [], label = null, visibilityConditions = 
   visibilityConditions: visibilityConditions || null, 
   get status() {
     const statuses = tasks.map((task) => task.status);
-    console.log(`[Schema] TaskGroup "${name}" Statuses:`, statuses);
+    //console.log(`[Schema] TaskGroup "${name}" Statuses:`, statuses);
     if (statuses.every((status) => status === 'complete')) return 'complete';
     if (statuses.some((status) => status === 'in-progress' || status === 'complete')) return 'in-progress';
     return 'pending';
@@ -67,7 +67,7 @@ const createComponent = (name, formFields = [], taskGroups = [], visibilityCondi
   taskGroups,
   get status() {
     const statuses = taskGroups.map((group) => group.status);
-    console.log(`[Schema] Component "${name}" TaskGroup Statuses:`, statuses);
+    //console.log(`[Schema] Component "${name}" TaskGroup Statuses:`, statuses);
     if (statuses.every((status) => status === 'complete')) return 'complete';
     if (statuses.some((status) => status === 'in-progress' || status === 'complete')) return 'in-progress';
     return 'pending';
