@@ -26,14 +26,17 @@ export const evaluateTaskTransition = (
   const conditions = [];
 
   if (newStatus === 'in-progress') {
-    conditions.push(taskReadyForProgress(componentName, taskGroupName, taskName));
+    const progressCondition = taskReadyForProgress(componentName, taskGroupName, taskName);
+    if (progressCondition) conditions.push(progressCondition);
   }
 
   if (newStatus === 'complete') {
-    conditions.push(taskReadyForCompletion(componentName, taskGroupName, taskName));
-    conditions.push(...additionalConditions); // Spread the array safely
+    const completionCondition = taskReadyForCompletion(componentName, taskGroupName, taskName);
+    if (completionCondition) conditions.push(completionCondition);
+    conditions.push(...additionalConditions);
   }
 
+   
   // Evaluate all conditions
   const failedConditions = conditions
     .map((condition) => condition(build))

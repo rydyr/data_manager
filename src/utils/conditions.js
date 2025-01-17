@@ -6,22 +6,17 @@ export const taskReadyForProgress = (
   taskName = null,
   verbose = false
 ) => (build) => {
+
   const component = build.components.find((c) => c.name === componentName);
   if (!component) {
     return { success: false, message: `Component "${componentName}" not found.` };
   }
 
-  if (component.status === 'complete') {
-    return { success: true, message: '' };
-  }
 
   const taskGroup = taskGroupName
     ? component.taskGroups.find((g) => g.name === taskGroupName)
     : null;
 
-  if (taskGroup && taskGroup.status === 'complete') {
-    return { success: true, message: '' };
-  }
 
   const task = taskGroup?.tasks.find((t) => t.name === taskName);
   if (!task) {
@@ -31,7 +26,10 @@ export const taskReadyForProgress = (
     };
   }
 
-  // Identify the prerequisite task
+  if (task.completionConditions === null) {
+    return { success: true, message: '' };
+  }
+
   const prerequisiteTask = taskGroup?.tasks.find((t) => t.status !== 'complete');
   if (prerequisiteTask) {
     return {
