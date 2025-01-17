@@ -32,6 +32,8 @@ export const exampleBuild = createBuild(
             createTask(
               'Select Barrel Material',
               [],
+              null,
+              null,
               null, // No conditions for in-progress
               null, // No conditions for completion
             ),

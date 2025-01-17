@@ -12,10 +12,18 @@ export const taskReadyForProgress = (
     return { success: false, message: `Component "${componentName}" not found.` };
   }
 
+  if (component.status === 'complete') {
+    return {success: true, message: ''}
+  }
+
 
   const taskGroup = taskGroupName
     ? component.taskGroups.find((g) => g.name === taskGroupName)
     : null;
+
+  if (taskGroup && taskGroup.status === 'complete') {
+    return {success: true, message: ''}
+  }
 
 
   const task = taskGroup?.tasks.find((t) => t.name === taskName);
@@ -26,7 +34,7 @@ export const taskReadyForProgress = (
     };
   }
 
-  if (task.completionConditions === null) {
+  if (task.inProgressConditions === null) {
     return { success: true, message: '' };
   }
 
