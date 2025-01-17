@@ -6,52 +6,96 @@ export const taskReadyForProgress = (
   taskName = null,
   verbose = false
 ) => (build) => {
-
   const component = build.components.find((c) => c.name === componentName);
   if (!component) {
-    return { success: false, message: `Component "${componentName}" not found.` };
+    return { success: false, message: `Component \"${componentName}\" not found.` };
   }
-
-  if (component.status === 'complete') {
-    return {success: true, message: ''}
-  }
-
 
   const taskGroup = taskGroupName
     ? component.taskGroups.find((g) => g.name === taskGroupName)
     : null;
 
-  if (taskGroup && taskGroup.status === 'complete') {
-    return {success: true, message: ''}
-  }
-
-
   const task = taskGroup?.tasks.find((t) => t.name === taskName);
   if (!task) {
     return {
       success: false,
-      message: `Task "${taskName}" not found in task group "${taskGroupName}" of component "${componentName}".`,
+      message: `Task \"${taskName}\" not found in task group \"${taskGroupName}\" of component \"${componentName}\".`,
     };
   }
 
-  if (task.inProgressConditions === null) {
-    return { success: true, message: '' };
+  if (!task.inProgressConditions) {
+    return { success: true, message: '' }; 
   }
 
-  const prerequisiteTask = taskGroup?.tasks.find((t) => t.status !== 'complete');
-  if (prerequisiteTask) {
+  // Evaluate inProgressConditions
+  const failedConditions = task.inProgressConditions.map((condition) => {
+    // Check for component-level conditions
+    if (condition.type === 'component') {
+      const dependencyComponent = build.components.find((c) => c.name === condition.component);
+      if (!dependencyComponent) {
+        return { success: false, message: `Component \"${condition.component}\" not found.` };
+      }
+
+      if (dependencyComponent.status !== 'complete') {
+        if (!verbose) {
+          return { success: false, message: `\"${condition.component}\" not complete.` };
+        }
+        return { success: false, message: `Component \"${condition.component}\" is not complete.` };
+      }
+
+      return { success: true };
+    }
+
+    // Check for taskGroup-level conditions
+    if (condition.type === 'taskGroup') {
+      const dependencyComponent = build.components.find((c) => c.name === condition.component);
+      const dependencyTaskGroup = dependencyComponent?.taskGroups.find((g) => g.name === condition.taskGroup);
+      if (!dependencyTaskGroup) {
+        return { success: false, message: `Task group \"${condition.taskGroup}\" not found in component \"${condition.component}\".` };
+      }
+
+      if (dependencyTaskGroup.status !== 'complete') {
+        if (!verbose) {
+          return { success: false, message: `\"${condition.taskGroup}\" is not complete.` };
+        }
+        return { success: false, message: `Task group \"${condition.taskGroup}\" in component \"${condition.component}\" is not complete.` };
+      }
+
+      return { success: true };
+    }
+
+    // Check for task-level conditions
+    if (condition.type === 'task') {
+      const dependencyComponent = build.components.find((c) => c.name === condition.component);
+      const dependencyTaskGroup = dependencyComponent?.taskGroups.find((g) => g.name === condition.taskGroup);
+      const dependencyTask = dependencyTaskGroup?.tasks.find((t) => t.name === condition.task);
+
+      if (!dependencyTask) {
+        return { success: false, message: `Task \"${condition.task}\" not found in task group \"${condition.taskGroup}\" of component \"${condition.component}\".` };
+      }
+
+      if (dependencyTask.status !== 'complete') {
+        if (!verbose) {
+          return { success: false, message: `\"${condition.task}\" is not complete.` };
+        }
+        return { success: false, message: `Task \"${condition.task}\" in task group \"${condition.taskGroup}\" of component \"${condition.component}\" is not complete.` };
+      }
+
+      return { success: true };
+    }
+
+    // Unknown condition type
+    return { success: false, message: `Unknown condition type \"${condition.type}\".` };
+  }).filter((result) => !result.success);
+
+  if (failedConditions.length > 0) {
     return {
       success: false,
-      message: `Task "${prerequisiteTask.name}" must be complete before "${taskName}" can begin.`,
+      message: failedConditions.map((c) => c.message).join(' '),
     };
   }
 
-  return {
-    success: false,
-    message: verbose
-      ? `Task "${taskName}" in "${taskGroupName}" of "${componentName}" must wait for prerequisites to be completed.`
-      : `"${taskName}" cannot begin yet.`,
-  };
+  return { success: true, message: '' };
 };
 
 
