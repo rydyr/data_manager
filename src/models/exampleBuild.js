@@ -1,3 +1,4 @@
+// src/models/exampleBuild.js
 import {
   createBuild,
   createComponent,
@@ -10,20 +11,20 @@ export const exampleBuild = createBuild(
   'Pencil Build',
   [
     // Build-level fields
-    createFormField('text', 'Project Name'),
-    createFormField('dropdown', 'Priority Level', ['High', 'Medium', 'Low']),
-    createFormField('text', 'Client Name'),
-    createFormField('number', 'Estimated Completion Time (days)'),
-    createFormField('checkbox', 'Rush Order?'),
+    createFormField('text', 'Project Name', [], null, null, null, null, null, {}, null, null, null, null, true),
+    createFormField('dropdown', 'Priority Level', ['High', 'Medium', 'Low'], null, null, null, null, null, {}, null, null, null, null, true),
+    createFormField('text', 'Client Name', [], null, null, null, null, null, {}, null, null, null, null, true),
+    createFormField('number', 'Estimated Completion Time (days)', [], null, null, null, null, null, {}, null, null, null, null, true),
+    createFormField('checkbox', 'Rush Order?', [], null, null, null, null, null, {}, null, null, null, null),
   ],
   [
     // Barrel Component
     createComponent(
       'Barrel',
       [
-        createFormField('dropdown', 'Barrel Material', ['Wood', 'Plastic', 'Composite']),
-        createFormField('text', 'Barrel Notes'),
-        createFormField('number', 'Barrel Length (cm)'),
+        createFormField('dropdown', 'Barrel Material', ['Wood', 'Plastic', 'Composite'], null, null, 'barrel_material', null, null, {}, null, null, null, null, true),
+        createFormField('text', 'Barrel Notes', [], null, null, 'barrel_notes'),
+        createFormField('number', 'Barrel Length (cm)', [], null, null, 'barrel_length', null, null, {}, null, null, null, null, true),
       ],
       [
         createTaskGroup(
@@ -32,27 +33,37 @@ export const exampleBuild = createBuild(
             createTask(
               'Select Barrel Material',
               [],
-              null, // No read-only conditions
-              null, // No visibility conditions
-              null, // No in-progress conditions
-              null  // No completion conditions
+              null,
+              null,
+              null,
+              []
             ),
             createTask(
               'Inspect Material',
-              [createFormField('text', 'Inspector Name')],
-              null, // No read-only conditions
-              null, // No visibility conditions
               [
-                { type: 'task', component: 'Barrel', taskGroup: 'Material Preparation', task: 'Select Barrel Material', verbose: true },
+                createFormField('text', 'Inspector Name', [], null, null, 'inspector_name', null, null, {}, null, null, null, null, true),
+              ],
+              null,
+              null,
+              [
+                { type: 'task', component: 'Barrel', taskGroup: 'Material Preparation', task: 'Select Barrel Material' },
+              ],
+              [
+                { component: 'Barrel', taskGroup: 'Material Preparation', task: 'Inspect Material', field: 'inspector_name' },
               ]
             ),
             createTask(
               'Cut Material',
-              [createFormField('number', 'Length to Cut (cm)')],
+              [
+                createFormField('number', 'Length to Cut (cm)', [], null, null, 'cut_length', null, null, {}, null, null, null, null, true),
+              ],
               null,
               null,
               [
-                { type: 'task', component: 'Barrel', taskGroup: 'Material Preparation', task: 'Inspect Material', verbose: false },
+                { type: 'task', component: 'Barrel', taskGroup: 'Material Preparation', task: 'Inspect Material' },
+              ],
+              [
+                { component: 'Barrel', taskGroup: 'Material Preparation', task: 'Cut Material', field: 'cut_length' },
               ]
             ),
           ]
@@ -62,35 +73,46 @@ export const exampleBuild = createBuild(
           [
             createTask(
               'Sand Barrel Edges',
-              [createFormField('checkbox', 'Edges Smooth?')],
+              [
+                createFormField('checkbox', 'Edges Smooth?', [], null, null, 'edges_smooth', null, null, {}, null, null, null, null, true),
+              ],
               null,
               null,
               [
                 { type: 'task', component: 'Barrel', taskGroup: 'Material Preparation', task: 'Cut Material' },
+              ],
+              [
+                { component: 'Barrel', taskGroup: 'Barrel Assembly', task: 'Sand Barrel Edges', field: 'edges_smooth' },
               ]
             ),
             createTask(
               'Assemble Barrel',
-              [createFormField('text', 'Assembly Notes')],
+              [
+                createFormField('text', 'Assembly Notes', [], null, null, 'assembly_notes', null, null, {}, null, null, null, null, true),
+              ],
               null,
               null,
               [
                 { type: 'task', component: 'Barrel', taskGroup: 'Barrel Assembly', task: 'Sand Barrel Edges' },
               ],
               [
-                { type: 'taskGroup', component: 'Barrel', taskGroup: 'Barrel Assembly' },
+                { component: 'Barrel', taskGroup: 'Barrel Assembly', task: 'Assemble Barrel', field: 'assembly_notes' },
               ]
             ),
             createTask(
               'Quality Check',
               [
-                createFormField('text', 'Quality Assurance Officer'),
-                createFormField('checkbox', 'Approved?'),
+                createFormField('text', 'Quality Assurance Officer', [], null, null, 'qa_officer', null, null, {}, null, null, null, null, true),
+                createFormField('checkbox', 'Approved?', [], null, null, 'approved_checkbox', null, null, {}, null, null, null, null, true),
               ],
               null,
               null,
               [
                 { type: 'task', component: 'Barrel', taskGroup: 'Barrel Assembly', task: 'Assemble Barrel' },
+              ],
+              [
+                { component: 'Barrel', taskGroup: 'Barrel Assembly', task: 'Quality Check', field: 'qa_officer' },
+                { component: 'Barrel', taskGroup: 'Barrel Assembly', task: 'Quality Check', field: 'approved_checkbox' },
               ]
             ),
           ]
@@ -101,9 +123,9 @@ export const exampleBuild = createBuild(
     createComponent(
       'Core',
       [
-        createFormField('dropdown', 'Core Type', ['Graphite', 'Lead', 'Charcoal']),
-        createFormField('number', 'Core Diameter (mm)'),
-        createFormField('number', 'Core Length (cm)'),
+        createFormField('dropdown', 'Core Type', ['Graphite', 'Lead', 'Charcoal'], null, null, 'core_type', null, null, {}, null, null, null, null, true),
+        createFormField('number', 'Core Diameter (mm)', [], null, null, 'core_diameter', null, null, {}, null, null, null, null, true),
+        createFormField('number', 'Core Length (cm)', [], null, null, 'core_length', null, null, {}, null, null, null, null, true),
       ],
       [
         createTaskGroup(
@@ -111,24 +133,42 @@ export const exampleBuild = createBuild(
           [
             createTask(
               'Mix Materials',
-              [createFormField('text', 'Material Mix Notes')]
+              [
+                createFormField('text', 'Material Mix Notes', [], null, null, 'mix_notes', null, null, {}, null, null, null, null, true),
+              ],
+              null,
+              null,
+              null,
+              [
+                { component: 'Core', taskGroup: 'Core Production', task: 'Mix Materials', field: 'mix_notes' },
+              ]
             ),
             createTask(
               'Mold Core',
-              [createFormField('text', 'Mold Technician Name')],
+              [
+                createFormField('text', 'Mold Technician Name', [], null, null, 'mold_technician', null, null, {}, null, null, null, null, true),
+              ],
               null,
               null,
               [
                 { type: 'task', component: 'Core', taskGroup: 'Core Production', task: 'Mix Materials' },
+              ],
+              [
+                { component: 'Core', taskGroup: 'Core Production', task: 'Mold Core', field: 'mold_technician' },
               ]
             ),
             createTask(
               'Refine Core',
-              [createFormField('number', 'Refinement Time (minutes)')],
+              [
+                createFormField('number', 'Refinement Time (minutes)', [], null, null, 'refinement_time', null, null, {}, null, null, null, null, true),
+              ],
               null,
               null,
               [
                 { type: 'task', component: 'Core', taskGroup: 'Core Production', task: 'Mold Core' },
+              ],
+              [
+                { component: 'Core', taskGroup: 'Core Production', task: 'Refine Core', field: 'refinement_time' },
               ]
             ),
           ]
@@ -139,17 +179,29 @@ export const exampleBuild = createBuild(
             createTask(
               'Stress Test',
               [
-                createFormField('text', 'Tester Name'),
-                createFormField('number', 'Test Pressure (kg/cm²)'),
+                createFormField('text', 'Tester Name', [], null, null, 'tester_name', null, null, {}, null, null, null, null, true),
+                createFormField('number', 'Test Pressure (kg/cm²)', [], null, null, 'test_pressure', null, null, {}, null, null, null, null, true),
+              ],
+              null,
+              null,
+              null,
+              [
+                { component: 'Core', taskGroup: 'Core Testing', task: 'Stress Test', field: 'tester_name' },
+                { component: 'Core', taskGroup: 'Core Testing', task: 'Stress Test', field: 'test_pressure' },
               ]
             ),
             createTask(
               'Finalize Core',
-              [createFormField('checkbox', 'Core Approved')],
+              [
+                createFormField('checkbox', 'Core Approved', [], null, null, 'core_approved', null, null, {}, null, null, null, null, true),
+              ],
               null,
               null,
               [
                 { type: 'task', component: 'Core', taskGroup: 'Core Testing', task: 'Stress Test' },
+              ],
+              [
+                { component: 'Core', taskGroup: 'Core Testing', task: 'Finalize Core', field: 'core_approved' },
               ]
             ),
           ]
@@ -160,9 +212,9 @@ export const exampleBuild = createBuild(
     createComponent(
       'Eraser',
       [
-        createFormField('dropdown', 'Eraser Material', ['Rubber', 'Vinyl']),
-        createFormField('text', 'Eraser Customization Notes'),
-        createFormField('checkbox', 'Eraser Tested?'),
+        createFormField('dropdown', 'Eraser Material', ['Rubber', 'Vinyl'], null, null, 'eraser_material', null, null, {}, null, null, null, null, true),
+        createFormField('text', 'Eraser Customization Notes', [], null, null, 'eraser_notes'),
+        createFormField('checkbox', 'Eraser Tested?', [], null, null, 'eraser_tested'),
       ],
       [
         createTaskGroup(
@@ -170,40 +222,28 @@ export const exampleBuild = createBuild(
           [
             createTask(
               'Cut Eraser Shape',
-              [createFormField('dropdown', 'Shape', ['Round', 'Square', 'Custom'])]
+              [
+                createFormField('dropdown', 'Shape', ['Round', 'Square', 'Custom'], null, null, 'eraser_shape', null, null, {}, null, null, null, null, true),
+              ],
+              null,
+              null,
+              null,
+              [
+                { component: 'Eraser', taskGroup: 'Eraser Production', task: 'Cut Eraser Shape', field: 'eraser_shape' },
+              ]
             ),
             createTask(
               'Color Eraser',
-              [createFormField('dropdown', 'Color', ['Pink', 'White', 'Blue'])],
+              [
+                createFormField('dropdown', 'Color', ['Pink', 'White', 'Blue'], null, null, 'eraser_color', null, null, {}, null, null, null, null, true),
+              ],
               null,
               null,
               [
                 { type: 'task', component: 'Eraser', taskGroup: 'Eraser Production', task: 'Cut Eraser Shape' },
-              ]
-            ),
-          ]
-        ),
-      ]
-    ),
-    // Paint Component
-    createComponent(
-      'Paint',
-      [
-        createFormField('dropdown', 'Paint Type', ['Glossy', 'Matte']),
-        createFormField('text', 'Custom Paint Notes'),
-      ],
-      [
-        createTaskGroup(
-          'Paint Application',
-          [
-            createTask('Prime Surface', []),
-            createTask(
-              'Apply Paint',
-              [createFormField('dropdown', 'Color', ['Yellow', 'Red', 'Green', 'Blue'])],
-              null,
-              null,
+              ],
               [
-                { type: 'task', component: 'Barrel', taskGroup: 'Barrel Assembly', task: 'Quality Check' },
+                { component: 'Eraser', taskGroup: 'Eraser Production', task: 'Color Eraser', field: 'eraser_color' },
               ]
             ),
           ]

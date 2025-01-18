@@ -1,3 +1,5 @@
+//src/utils/taskEvaluator.js
+
 import { taskReadyForProgress, taskReadyForCompletion } from './conditions.js';
 
 const conditionMap = {
@@ -11,29 +13,21 @@ export const evaluateTaskTransition = (
   taskGroupName,
   taskName,
   newStatus,
-  additionalConditions = []
 ) => {
   console.log(`Evaluating transition for "${taskName}" to "${newStatus}"`);
-
-  // Ensure additionalConditions is an array
-  if (!Array.isArray(additionalConditions)) {
-    console.warn(
-      `Expected additionalConditions to be an array, but received: ${typeof additionalConditions}. Defaulting to an empty array.`
-    );
-    additionalConditions = [];
-  }
 
   const conditions = [];
 
   if (newStatus === 'in-progress') {
     const progressCondition = taskReadyForProgress(componentName, taskGroupName, taskName);
+    console.log('Progress Condition', progressCondition)
     if (progressCondition) conditions.push(progressCondition);
   }
 
   if (newStatus === 'complete') {
     const completionCondition = taskReadyForCompletion(componentName, taskGroupName, taskName);
+    console.log('Completion Condition', completionCondition)
     if (completionCondition) conditions.push(completionCondition);
-    conditions.push(...additionalConditions);
   }
 
    
@@ -43,7 +37,7 @@ export const evaluateTaskTransition = (
     .filter((result) => !result.success);
 
   if (failedConditions.length > 0) {
-    console.error(`Failed conditions for "${taskName}":`, failedConditions);
+    //console.error(`Failed conditions for "${taskName}":`, failedConditions);
     return {
       success: false,
       message: failedConditions.map((c) => c.message).join(' '),

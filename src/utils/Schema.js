@@ -1,8 +1,8 @@
-//src/models/schema.js
+//src/utils/schema.js
 import { v4 as uuidv4 } from 'uuid';
 
 
-const createFormField = (type, label, options = [], readOnlyConditions = null, visibilityConditions = null, testId = null, message = null, messageCondition = null, messageStyle = {}, group = null, groupLabel = null, groupReadOnlyConditions = null, groupVisibilityConditions = null) => {
+const createFormField = (type, label, options = [], readOnlyConditions = null, visibilityConditions = null, testId = null, message = null, messageCondition = null, messageStyle = {}, group = null, groupLabel = null, groupReadOnlyConditions = null, groupVisibilityConditions = null, required = false) => {
   const validFieldTypes = ['text', 'number', 'checkbox', 'dropdown'];
   if (!validFieldTypes.includes(type)) {
     throw new Error(`Invalid field type: ${type}`);
@@ -23,6 +23,7 @@ const createFormField = (type, label, options = [], readOnlyConditions = null, v
     groupLabel,
     groupReadOnlyConditions,
     groupVisibilityConditions,
+    required
   };
 };
 
@@ -37,7 +38,7 @@ const createTask = (name, formFields = [], readOnlyConditions = null, visibility
   readOnlyConditions: readOnlyConditions || null,
   visibilityConditions: visibilityConditions || null,
   inProgressConditions,
-  completionConditions: completionConditions || (() => ({success: true, message: ''})),
+  completionConditions,
   testId,
 });
 
