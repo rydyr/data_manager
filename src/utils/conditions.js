@@ -4,7 +4,7 @@ export const taskReadyForProgress = (
   componentName,
   taskGroupName = null,
   taskName = null,
-  verbose = false
+  verbose = true
 ) => (build) => {
   const component = build.components.find((c) => c.name === componentName);
   if (!component) {
@@ -37,7 +37,7 @@ export const taskReadyForProgress = (
       }
 
       if (dependencyComponent.status !== 'complete') {
-        if (!verbose) {
+        if (!task.inProgressConditions.verbose) {
           return { success: false, message: `\"${condition.component}\" not complete.` };
         }
         return { success: false, message: `Component \"${condition.component}\" is not complete.` };
@@ -55,7 +55,7 @@ export const taskReadyForProgress = (
       }
 
       if (dependencyTaskGroup.status !== 'complete') {
-        if (!verbose) {
+        if (!task.inProgressConditions.verbose) {
           return { success: false, message: `\"${condition.taskGroup}\" is not complete.` };
         }
         return { success: false, message: `Task group \"${condition.taskGroup}\" in component \"${condition.component}\" is not complete.` };
@@ -75,10 +75,10 @@ export const taskReadyForProgress = (
       }
 
       if (dependencyTask.status !== 'complete') {
-        if (!verbose) {
-          return { success: false, message: `\"${condition.task}\" is not complete.` };
+        if (!task.inProgressConditions.verbose) {
+          return { success: false, message: `Task \"${condition.task}\" in task group \"${condition.taskGroup}\" of component \"${condition.component}\" is not complete.` };
         }
-        return { success: false, message: `Task \"${condition.task}\" in task group \"${condition.taskGroup}\" of component \"${condition.component}\" is not complete.` };
+        return { success: false, message: `\"${condition.task}\" is not complete.` };
       }
 
       return { success: true };

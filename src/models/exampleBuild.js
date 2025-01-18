@@ -43,7 +43,7 @@ export const exampleBuild = createBuild(
               null, // No read-only conditions
               null, // No visibility conditions
               [
-                { type: 'task', component: 'Barrel', taskGroup: 'Material Preparation', task: 'Select Barrel Material' },
+                { type: 'task', component: 'Barrel', taskGroup: 'Material Preparation', task: 'Select Barrel Material', verbose: true },
               ]
             ),
             createTask(
@@ -52,7 +52,7 @@ export const exampleBuild = createBuild(
               null,
               null,
               [
-                { type: 'task', component: 'Barrel', taskGroup: 'Material Preparation', task: 'Inspect Material' },
+                { type: 'task', component: 'Barrel', taskGroup: 'Material Preparation', task: 'Inspect Material', verbose: false },
               ]
             ),
           ]
