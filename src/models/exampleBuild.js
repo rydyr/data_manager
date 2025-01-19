@@ -74,7 +74,7 @@ export const exampleBuild = createBuild(
             createTask(
               'Sand Barrel Edges',
               [
-                createFormField('checkbox', 'Edges Smooth?', [], null, null, 'edges_smooth', null, null, {}, null, null, null, null, true),
+                createFormField('checkbox', 'Edges Smooth?', [], null, null, 'edges_smooth', null, null, {}, null, null, null, null, false),
               ],
               null,
               null,
@@ -227,7 +227,9 @@ export const exampleBuild = createBuild(
               ],
               null,
               null,
-              null,
+              [
+                {type: 'component', component: 'Barrel'}
+              ],
               [
                 { component: 'Eraser', taskGroup: 'Eraser Production', task: 'Cut Eraser Shape', field: 'eraser_shape' },
               ]
