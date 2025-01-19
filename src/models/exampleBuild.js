@@ -50,7 +50,10 @@ export const exampleBuild = createBuild(
               ],
               [
                 { component: 'Barrel', taskGroup: 'Material Preparation', task: 'Inspect Material', field: 'inspector_name' },
-              ]
+              ],
+              null,
+              null,
+              true
             ),
             createTask(
               'Cut Material',

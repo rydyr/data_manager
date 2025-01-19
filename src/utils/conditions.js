@@ -36,7 +36,7 @@ export const taskReadyForProgress = (
       }
 
       if (dependencyComponent.status !== 'complete') {               
-        return { success: false, message: `Component \"${condition.component}\" is not complete.` };
+        return { success: false, message: `\"${condition.component}\" is not complete.` };
       }
 
       return { success: true };
@@ -47,11 +47,14 @@ export const taskReadyForProgress = (
       const dependencyComponent = build.components.find((c) => c.name === condition.component);
       const dependencyTaskGroup = dependencyComponent?.taskGroups.find((g) => g.name === condition.taskGroup);
       if (!dependencyTaskGroup) {
-        return { success: false, message: `Task group \"${condition.taskGroup}\" not found in component \"${condition.component}\".` };
+        return { success: false, message: `Task Group \"${condition.taskGroup}\" not found in Component \"${condition.component}\".` };
       }
 
       if (dependencyTaskGroup.status !== 'complete') {
-        return { success: false, message: `Task group \"${condition.taskGroup}\" in component \"${condition.component}\" is not complete.` };
+        if (task.concise) {
+          return { success: false, message: `${condition.taskGroup} is not complete.`}
+        }
+        return { success: false, message: `\"${condition.taskGroup}\" in \"${condition.component}\" is not complete.` };
       }
 
       return { success: true };
@@ -68,7 +71,10 @@ export const taskReadyForProgress = (
       }
 
       if (dependencyTask.status !== 'complete') {
-        return { success: false, message: `Task \"${condition.task}\" in task group \"${condition.taskGroup}\" of component \"${condition.component}\" is not complete.` };
+        if (task.concise) {
+          return { success: false, message: `\"${condition.task}\" is not complete.`}
+        }
+        return { success: false, message: `\"${condition.task}\" in \"${condition.taskGroup}\" of \"${condition.component}\" is not complete.` };
       }
 
       return { success: true };

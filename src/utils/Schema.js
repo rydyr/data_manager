@@ -29,7 +29,7 @@ const createFormField = (type, label, options = [], readOnlyConditions = null, v
 
 
 
-const createTask = (name, formFields = [], readOnlyConditions = null, visibilityConditions = null, inProgressConditions = [], completionConditions = null, label = null, testId = null) => ({
+const createTask = (name, formFields = [], readOnlyConditions = null, visibilityConditions = null, inProgressConditions = [], completionConditions = null, label = null, testId = null, concise = false) => ({
   id: uuidv4(),
   name,
   label: label || name,
@@ -40,6 +40,7 @@ const createTask = (name, formFields = [], readOnlyConditions = null, visibility
   inProgressConditions,
   completionConditions,
   testId,
+  concise,
 });
 
 
